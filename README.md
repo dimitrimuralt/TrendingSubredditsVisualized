@@ -1,2 +1,4 @@
 # ivisPro
-Semester Project for ivis class
+Data Visualization Project for ivis class
+
+Worklog: [html/worklog.html](/html/worklog.html)
