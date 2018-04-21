@@ -3,8 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <title>Worklog</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+
 </head>
 <body>
+<div class="wrapper">
+    <section id="context">
+        <h1>Worklog</h1>
+        <h2>Grundlage</h2>
+        <p>
+            Als Grundlage für unser Projekt haben wir unser Scatterplot aus einer früheren Übung benutzt.
+            So konnten wir einen Teil der Code Struktur übernehmen und hatten schon mal eine gute Grundlage für das Projekt.
+        </p><br>
 
+        <h2>Parsing von NDJSON</h2>
+        <p>
+            Die uns vorliegenden Quelldaten zu den Reddit Post und Kommentaren sind nur im NDJSON format vorhanden.
+            Leider kann d3.js von sich aus kein NDJSON einlesen. Dass dieses Format überhaupt existiert, war uns lange
+            nicht bewusst.
+            Auch nach einer Nachfrage auf <a
+                href="https://stackoverflow.com/questions/49612350/d3-js-parse-json-like-data-from-file">Stackoverflow</a>
+            waren wir verunsichert, da die Antworten eher darauf schliessen liessen, dass
+            die Daten in einem ungültigen Format vorliegen. Eher durch Zufall sind wir dann auf eine <a
+                href="https://github.com/ndjson/ndjson-spec">Spezifikation</a> gestossen, die dieses
+            Format erklärt hat.
+        </p><br>
+
+        <p>
+            <b>NDJSON</b></p>
+        <code>
+            {"name":"Andy Hunt","title":"Big Boss","age":68,"bonus":true}<br>
+            {"name":"Charles Mack","title":"Jr Dev","age":24,"bonus":false}
+        </code><br><br>
+
+        <p><b>JSON Array</b></p>
+        <code>
+            [<br>
+            {"name":"Andy Hunt","title":"Big Boss","age":68,"bonus":true},<br>
+            {"name":"Charles Mack","title":"Jr Dev","age":24,"bonus":false}<br>
+            ]
+        </code><br><br>
+        <p>
+            Eine der Antworten lieferte uns jedoch die Idee, dass wir selber einen NDJSON Parser bauen könnten. Mit
+            Hilfe dessen wird nun das Input-File Zeile für Zeile durchgelesen und geparst.
+        </p><br>
+
+        <h2>Hindernisse während der Implementierung</h2>
+        <p><b>Formatierung des Datums</b></p>
+        <p>
+            Die Formatierung des Datums machte anfangs ein wenig Probleme und hat viel Zeit gekostet.
+            Das das Datum formatiert werden musste, war schnell klar. Ebenso wie das implementiert wird.
+            Allerdings machte uns das Anwenden des Formats auf die Achsen und den Plot ein ziemlich Mühe.
+        </p><br>
+
+    </section>
+</div>
 </body>
 </html>

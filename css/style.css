@@ -1,0 +1,135 @@
+body {
+    text-align: center;
+}
+
+.wrapper {
+    text-align: left;
+    max-width: 40%;
+    margin: 0 auto;
+}
+
+@media only screen and (max-width: 1024px) {
+    /* For mobile phones: */
+    [class*="wrapper"] {
+        max-width: 80%;
+    }
+}
+
+h1 {
+    box-sizing: border-box;
+    color: rgb(0, 0, 0);
+    font-family: Raleway, serif;
+    font-size: 2.5em;
+    font-weight: 600;
+    hyphens: manual;
+    line-height: 52px;
+    margin-bottom: 13px;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 5px;
+}
+
+h2 {
+    border-bottom-color: rgb(222, 222, 217);
+    border-bottom-style: solid;
+    border-bottom-width: 4px;
+    box-sizing: border-box;
+    color: rgb(0, 0, 0);
+    font-family: Raleway, sans-serif;
+    font-size: 1.5em;
+    font-weight: 700;
+    hyphens: manual;
+    line-height: 24.2px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-bottom: 8px;
+    position: relative;
+}
+
+p {
+    box-sizing: border-box;
+    color: rgb(76, 76, 76);
+    font-family: Raleway, serif;
+    font-size: 1em;
+    font-weight: 500;
+    hyphens: manual;
+    line-height: 26px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+    text-align: left;
+}
+
+ul {
+    color: rgb(76, 76, 76);
+    font-family: Raleway, serif;
+    font-size: 1em;
+    font-weight: 500;
+}
+
+dfn {
+    border-bottom-width: 1px;
+    border-bottom-style: dotted;
+    border-bottom-color: black;
+}
+
+#topics {
+    font-family: Raleway, serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#topics td, #topics th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+#topics tr:nth-child(even){background-color: #f2f2f2;}
+
+#topics tr:hover {background-color: #ddd;}
+
+#topics th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #FDE70E;
+    color: black;
+}
+
+tr.holiday {
+    font-style: italic
+}
+
+tr.exercise {
+    font-weight: bold;
+}
+
+header {
+    font-family: Raleway, serif;
+    font-size: 0.8em;
+    font-weight: 500;
+    margin-top: 0px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 0px;
+    background-color: #FDE70E;
+}
+
+footer {
+    font-family: Raleway, serif;
+    font-size: 0.8em;
+    font-weight: 500;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 5px;
+    padding-right: 0px;
+    background-color: #FDE70E;
+}
