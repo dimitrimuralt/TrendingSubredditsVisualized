@@ -97,6 +97,7 @@ d3.text("./data/top10SubredditsByDate.json", function(error, text) {
 
     // Create tooltip
     var tooltip = d3.select("body").append("div").classed("tooltip", true);
+    tooltip.style("visibility", "hidden")
     var dayFormater = d3.timeFormat("%A, %d. %B %Y%")
 
     data_points.on("mouseover", function(d, i) {
