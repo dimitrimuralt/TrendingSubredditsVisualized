@@ -15,3 +15,17 @@ path {
     fill: none;
     stroke-width: 1px;
 }
+
+.postsContainer {
+    display: -webkit-flex;
+    display: flex;
+}
+
+.postsContainer > div {
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+    padding: 10px;
+}
+
+
