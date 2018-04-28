@@ -204,7 +204,9 @@ function analyze(error, posts, postDetails) {
 
 
     chartInnerGroup.call(d3.zoom()
-        .scaleExtent([1,4])
+        .scaleExtent([1, 20])
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
         .on("zoom",function () {
             chartInnerGroup.attr("transform",d3.event.transform);
 
