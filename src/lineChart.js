@@ -28,14 +28,17 @@ svg.append("text")
     .text("Most popular Subreddits");
 
 
-d3.json("./data/top10SubredditsByDate.json", function(error, posts) {
+d3.json("./data/top10SubredditsByDate.json").get(function (error,posts) {
 
     // Format the date
-    const parseDate = d3.timeParse("%Y-%m-%d");
+    var parseDate = d3.timeParse("%Y-%m-%d");
     posts.forEach(function(d) {
         d.postedDate = parseDate(d.postedDate);
-        d.postsPerDay = +d.postsPerDay;
+        //d.postsPerDay =+ d.postsPerDay;
     });
+
+
+
 
     // Define the value domains
     const dateDomain = d3.extent(posts, function(d) { return d.postedDate; });
@@ -54,14 +57,14 @@ d3.json("./data/top10SubredditsByDate.json", function(error, posts) {
     const xAxis = d3.axisBottom(xScale);
     lineChartGroup
         .append("g")  // create a group and add axis
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis
-            .tickFormat(d3.timeFormat("%Y-%m-%d")))
-        .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)");
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis
+                .tickFormat(d3.timeFormat("%Y-%m-%d")))
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");
 
     // Create yAxis
     const yAxis = d3.axisLeft(yScale);
@@ -73,21 +76,41 @@ d3.json("./data/top10SubredditsByDate.json", function(error, posts) {
     const data_points = lineChartGroup.selectAll("circle")
         .data(posts)
         .enter().append("circle")
-        .attr("cx", function(d) { return xScale(d.postedDate); })
-        .attr("cy", d => yScale(d.postsPerDay))
-        .attr("r", 4)
-        .style("fill", d => colorScale(d["subreddit"]));
+            .attr("cx", function(d) { return xScale(d.postedDate); })
+            .attr("cy", d => yScale(d.postsPerDay))
+            .attr("r", 4)
+            .style("fill", d => colorScale(d["subreddit"]));
+
+    //create line generator
+    const line = d3.line()
+        .x(function (d) {return xScale(d.postedDate);})
+        .y(function (d) {return yScale(d.postsPerDay);})
+        .curve(d3.curveCardinal)
+    ;
+
+    // group date by subreddit
+    const nestedBySubreddit = d3.nest()
+        .key(function (d) {return d.subredditId; })
+        .entries(posts);
+
+    // draw lines which connect all subreddits with the same name
+    nestedBySubreddit.forEach(function (d) {
+        lineChartGroup
+            .append("path")
+            .attr("d",line(d.values))
+            .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
+    });
 
     // Create tooltip
     const tooltip = d3.select("body").append("div").classed("tooltip", true);
     tooltip.style("visibility", "hidden");
-    const dayFormater = d3.timeFormat("%A, %d. %B %Y%");
+    const dayFormatter = d3.timeFormat("%A, %d. %B %Y%");
 
     data_points.on("mouseover", function(d, i) {
         tooltip
             .html(`Subreddit: ${d["subreddit"]}<br/>`
                 + `Posts today: ${d.postsPerDay}<br/>`
-                + `Date: ${dayFormater(d.postedDate)}<br/>`)
+                + `Date: ${dayFormatter(d.postedDate)}<br/>`)
             .style("visibility", "visible")
             .style("left", (d3.event.pageX) + "px")
             .style("top", (d3.event.pageY - 28) + "px");
@@ -96,17 +119,6 @@ d3.json("./data/top10SubredditsByDate.json", function(error, posts) {
             tooltip.style("visibility", "hidden")
         });
 
-    /*
-    // Define the line
-        var connectorLine = d3.line()
-            .x(function(d) { return xScale(d.postedDate); })
-            .y(function(d) { return yScale(d.postsPerDay); });
-
-        // Add the connectorLine path.
-        g.append("path")
-            .attr("class", "line")
-            .attr("d", connectorLine(data));
-    */
 
     // Text label for the y axis
     lineChartGroup.append("text")

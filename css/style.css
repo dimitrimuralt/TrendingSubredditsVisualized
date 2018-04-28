@@ -133,3 +133,9 @@ footer {
     padding-right: 0px;
     background-color: #FDE70E;
 }
+
+
+path {
+    fill: none;
+    stroke-width: 1px;
+}
