@@ -11,9 +11,19 @@ const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
 
 // Create parent group and add left and top margin
-const lineChartGroup = svg.append("g")
-    .attr("id", "chart-area")
+const chartOuterGroup = svg.append("g")
+    //.attr("id", "chart-area")
     .attr("transform", "translate(" +margin.left + "," + margin.top + ")");
+
+
+
+const chartInnerGroup = chartOuterGroup.append("g");
+//add dummy rect so that the cahrt becomes selectable when zooming
+var view = chartInnerGroup.append("rect")
+    .attr("width", canvWidth)
+    .attr("height", canvHeight)
+    .attr("fill","white")
+;
 
 const colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -49,7 +59,6 @@ function analyze(error, posts, postDetails) {
         //d.postsPerDay =+ d.postsPerDay;
     });
 
-
     // Define the value domains
     const dateDomain = d3.extent(posts, function (d) {
         return d.postedDate;
@@ -57,17 +66,19 @@ function analyze(error, posts, postDetails) {
     const postsDomain = d3.extent(posts, d => Number(d.postsPerDay));
 
     // Create scales for x and y direction
-    const xScale = d3.scaleTime()
+    var xScale = d3.scaleTime()
         .range([0, width])
-        .domain(dateDomain);
-    const yScale = d3.scaleLinear()
+        .domain(dateDomain)
+        .nice(10);
+    var yScale = d3.scaleLinear()
         .rangeRound([height, 0])
         .domain(postsDomain)
-        .nice(5);
+        .nice(10);
 
     // Create xAxis
-    const xAxis = d3.axisBottom(xScale);
-    lineChartGroup
+    var xAxis = d3.axisBottom(xScale);
+
+    chartOuterGroup
         .append("g")  // create a group and add axis
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis
@@ -76,16 +87,18 @@ function analyze(error, posts, postDetails) {
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)");
+        .attr("transform", "rotate(-65)")
+    ;
 
     // Create yAxis
-    const yAxis = d3.axisLeft(yScale);
-    lineChartGroup
+    var yAxis = d3.axisLeft(yScale);
+
+    chartOuterGroup
         .append("g")  // create a group and add axis
         .call(yAxis);
 
     // Text label for the y axis
-    lineChartGroup.append("text")
+    chartOuterGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left / 1.5)
         .attr("x", 0 - (height / 2))
@@ -95,7 +108,7 @@ function analyze(error, posts, postDetails) {
         .text("Posts per day");
 
     // Text label for the x axis
-    lineChartGroup.append("text")
+    chartOuterGroup.append("text")
         .attr("y", height + margin.bottom / 1.5)
         .attr("x", width / 2)
         .attr("dy", "1em")
@@ -125,7 +138,7 @@ function analyze(error, posts, postDetails) {
 
     // draw lines which connect all subreddits with the same name
     nestedBySubreddit.forEach(function (d) {
-        lineChartGroup
+        chartInnerGroup
             .append("path")
             .attr("d", line(d.values))
             .attr("stroke", function () {
@@ -134,7 +147,7 @@ function analyze(error, posts, postDetails) {
     });
 
     // add circles
-    const dataPoint = lineChartGroup.selectAll("circle")
+    const dataPoint = chartInnerGroup.selectAll("circle")
         .data(posts)
         .enter().append("circle")
         .attr("cx", function (d) {
@@ -189,6 +202,13 @@ function analyze(error, posts, postDetails) {
 
         });
 
+
+    chartInnerGroup.call(d3.zoom()
+        .scaleExtent([1,4])
+        .on("zoom",function () {
+            chartInnerGroup.attr("transform",d3.event.transform);
+
+    }));
 
 
 
