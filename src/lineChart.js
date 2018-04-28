@@ -11,7 +11,7 @@ const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
 
 // Create parent group and add left and top margin
-const g = svg.append("g")
+const lineChartGroup = svg.append("g")
     .attr("id", "chart-area")
     .attr("transform", "translate(" +margin.left + "," + margin.top + ")");
 
@@ -25,40 +25,21 @@ svg.append("text")
     .attr("font-family", "sans-serif")
     .attr("font-size", "24px")
     .style("text-anchor", "left")
-    .text("Most popular Subreddits Jan/Feb 2018");
+    .text("Most popular Subreddits");
 
-/*
-The input data file is formatted as NDJSON. D3.JS cannot handle this format.
-Therefore we will parse it line by line and add it to the data array.
- */
-// Define data array
-var data = [];
-// Bind file as text
-d3.text("./data/top10SubredditsByDate.json", function(error, text) {
-    if (error) throw error;
-    // Split on a new line
-    var txt = text.split("\n");
-    // Iterate through the input file until all rows have been parsed
-    for (var i = 0; i < txt.length; i += 1) {
-        var block = "";
-        block += txt[i];
-        // Parse as JSON and push to data array
-        data.push(JSON.parse(block));
-    }
-/*
- Now we can process the data as normal JSON array
-*/
-    // Format the data
-    var parser = d3.timeParse("%Y-%m-%d");
 
-    data.forEach(function(d) {
-        d.postedDate = parser(d.postedDate);
+d3.json("./data/top10SubredditsByDate.json", function(error, posts) {
+
+    // Format the date
+    const parseDate = d3.timeParse("%Y-%m-%d");
+    posts.forEach(function(d) {
+        d.postedDate = parseDate(d.postedDate);
         d.postsPerDay = +d.postsPerDay;
     });
 
     // Define the value domains
-    const dateDomain = d3.extent(data, function(d) { return d.postedDate; });
-    const postsDomain = d3.extent(data, d => Number(d.postsPerDay));
+    const dateDomain = d3.extent(posts, function(d) { return d.postedDate; });
+    const postsDomain = d3.extent(posts, d => Number(d.postsPerDay));
 
     // Create scales for x and y direction
     const xScale = d3.scaleTime()
@@ -71,7 +52,8 @@ d3.text("./data/top10SubredditsByDate.json", function(error, text) {
 
     // Create xAxis
     const xAxis = d3.axisBottom(xScale);
-    g.append("g")  // create a group and add axis
+    lineChartGroup
+        .append("g")  // create a group and add axis
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis
             .tickFormat(d3.timeFormat("%Y-%m-%d")))
@@ -83,12 +65,13 @@ d3.text("./data/top10SubredditsByDate.json", function(error, text) {
 
     // Create yAxis
     const yAxis = d3.axisLeft(yScale);
-    g.append("g")  // create a group and add axis
+    lineChartGroup
+        .append("g")  // create a group and add axis
         .call(yAxis);
 
     // add circles
-    var data_points = g.selectAll("circle")
-        .data(data)
+    const data_points = lineChartGroup.selectAll("circle")
+        .data(posts)
         .enter().append("circle")
         .attr("cx", function(d) { return xScale(d.postedDate); })
         .attr("cy", d => yScale(d.postsPerDay))
@@ -96,9 +79,9 @@ d3.text("./data/top10SubredditsByDate.json", function(error, text) {
         .style("fill", d => colorScale(d["subreddit"]));
 
     // Create tooltip
-    var tooltip = d3.select("body").append("div").classed("tooltip", true);
-    tooltip.style("visibility", "hidden")
-    var dayFormater = d3.timeFormat("%A, %d. %B %Y%")
+    const tooltip = d3.select("body").append("div").classed("tooltip", true);
+    tooltip.style("visibility", "hidden");
+    const dayFormater = d3.timeFormat("%A, %d. %B %Y%");
 
     data_points.on("mouseover", function(d, i) {
         tooltip
@@ -113,20 +96,20 @@ d3.text("./data/top10SubredditsByDate.json", function(error, text) {
             tooltip.style("visibility", "hidden")
         });
 
-/*
-// Define the line
-    var connectorLine = d3.line()
-        .x(function(d) { return xScale(d.postedDate); })
-        .y(function(d) { return yScale(d.postsPerDay); });
+    /*
+    // Define the line
+        var connectorLine = d3.line()
+            .x(function(d) { return xScale(d.postedDate); })
+            .y(function(d) { return yScale(d.postsPerDay); });
 
-    // Add the connectorLine path.
-    g.append("path")
-        .attr("class", "line")
-        .attr("d", connectorLine(data));
-*/
+        // Add the connectorLine path.
+        g.append("path")
+            .attr("class", "line")
+            .attr("d", connectorLine(data));
+    */
 
     // Text label for the y axis
-    g.append("text")
+    lineChartGroup.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left / 1.5)
         .attr("x",0 - (height / 2))
@@ -136,11 +119,12 @@ d3.text("./data/top10SubredditsByDate.json", function(error, text) {
         .text("Posts per day");
 
     // Text label for the x axis
-    g.append("text")
+    lineChartGroup.append("text")
         .attr("y", height + margin.bottom / 1.5)
         .attr("x", width / 2)
         .attr("dy", "1em")
         .attr("font-family", "sans-serif")
         .style("text-anchor", "middle")
         .text("Date");
+
 });
