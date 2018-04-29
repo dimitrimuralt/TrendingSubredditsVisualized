@@ -80,15 +80,22 @@ function analyze(error, posts, postDetails) {
 
     var brush = d3.brushX()
         .extent([[0, 0], [width, heightTimeSlider]])
-   //     .on("brush end", brushed)
+        .on("brush end", brushed)
     ;
 
     var zoom = d3.zoom()
-        .scaleExtent([1, 6])
+        .scaleExtent([1, 12])
         .translateExtent([[0, 0], [width, height]])
         .extent([[0, 0], [width, height]])
-    //    .on("zoom", zoomed)
+        .on("zoom", zoomed)
     ;
+
+    svg.append("rect")
+        .attr("class", "zoom")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .call(zoom);
 
     //todo: read documentation
     svg.append("defs").append("clipPath")
@@ -106,18 +113,22 @@ function analyze(error, posts, postDetails) {
         .attr("transform", "translate(" + marginTimeSlider.left + "," + marginTimeSlider.top + ")");
 
     focus.append("g")
+        .attr("class", "axis axis--x")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis
             .tickFormat(d3.timeFormat("%Y-%m-%d")))
+      /*
         .selectAll("text")
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)")
+        //.attr("transform", "rotate(-65)")
     ;
+    */
 
 
     focus.append("g")
+        .attr("class", "axis axis--y")
         .call(yAxis);
 
     // Text label for the y axis
@@ -139,32 +150,36 @@ function analyze(error, posts, postDetails) {
         .style("text-anchor", "middle")
         //.text("Date")
     ;
-    //create line generator
-    const lineChart = d3.line()
-        .x(function (d) { return xScale(d.postedDate);})
-        .y(function (d) { return yScale(d.postsPerDay);})
-        .curve(d3.curveCardinal) ;
 
+    /*
     // group date by subreddit
-    const nestedBySubreddit = d3.nest()
+    var nestedBySubreddit = d3.nest()
         .key(function (d) {return d.subredditId;})
         .entries(posts);
 
+    //create line generator
+    var lineChart = d3.line()
+        .x(d=> xScale(d.postedDate))
+        .y(d=> yScale(d.postsPerDay))
+        .curve(d3.curveCardinal) ;
+
+
     // draw lines which connect all subreddits with the same name
     nestedBySubreddit.forEach(function (d) {
-        chartInnerGroup
+        focus
             .append("path")
+            .attr("class","connectorLine")
             .attr("d", lineChart(d.values))
             .attr("stroke", function () {return colorScale(d.values[0].subreddit) });
     });
+
+    */
     // add circles to main chart
-    const circlesChart = focus.selectAll("circle.circlesChart")
+    var circlesChart = focus.selectAll("circle.circlesChart")
         .data(posts)
         .enter().append("circle")
             .attr("class", "circlesChart")
-            .attr("cx", function (d) {
-                return xScale(d.postedDate);
-            })
+            .attr("cx", d => xScale(d.postedDate))
             .attr("cy", d => yScale(d.postsPerDay))
             .attr("r", 4)
             .style("fill", d => colorScale(d["subreddit"]));
@@ -174,7 +189,7 @@ function analyze(error, posts, postDetails) {
     context.append("g")
         .attr("transform", "translate(0," + heightTimeSlider + ")")
         .call(xAxis
-            .tickFormat(d3.timeFormat("%Y-%m")))
+            .tickFormat(d3.timeFormat("%Y-%m-%d")))
         .selectAll("text")
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
@@ -183,18 +198,19 @@ function analyze(error, posts, postDetails) {
         .attr("transform", "translate(" + 30 + "," + 5 + ")");
     ;
 
-    const circlesTimeScale = context.selectAll("circle.circlesTimeScale")
+    var circlesTimeScale = context.selectAll("circle.circlesTimeScale")
         .data(posts)
         .enter().append("circle")
             .attr("class", "circlesTimeScale")
-            .attr("cx", function (d) {
-                return xScaleTimeSlider(d.postedDate);
-            })
+            .attr("cx", d => xScaleTimeSlider(d.postedDate))
             .attr("cy", d => yScaleTimeSlider(d.postsPerDay))
             .attr("r", 1)
         ;
 
-
+    context.append("g")
+        .attr("class", "brush")
+        .call(brush)
+        .call(brush.move, xScale.range());
 
     // Create tooltip
     const tooltip = d3.select("body").append("div").classed("tooltip", true);
@@ -239,19 +255,34 @@ function analyze(error, posts, postDetails) {
 
         });
 
-
-/*
-    chartInnerGroup.call(d3.zoom()
-        .scaleExtent([1, 20])
-        .translateExtent([[0, 0], [width, height]])
-        .extent([[0, 0], [width, height]])
-        .on("zoom",function () {
-            chartInnerGroup.attr("transform",d3.event.transform);
-
-    }));
+    //Source: https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
+    function brushed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "zoom") return; // ignore brush-by-zoom
+        var s = d3.event.selection || xScaleTimeSlider.range();
+        xScale.domain(s.map(xScaleTimeSlider.invert, xScaleTimeSlider));
+        focus.selectAll(".circlesChart")
+            .attr("cx", d => xScale(d.postedDate))
+            .attr("cy", d => yScale(d.postsPerDay));
 
 
-*/
+        focus.select(".axis--x").call(xAxis);
+        svg.select(".zoom").call(zoom.transform, d3.zoomIdentity
+            .scale(width / (s[1] - s[0]))
+            .translate(-s[0], 0));
+    }
+
+    function zoomed() {
+        if (d3.event.sourceEvent && d3.event.sourceEvent.type === "brush") return; // ignore zoom-by-brush
+        var t = d3.event.transform;
+        xScale.domain(t.rescaleX(xScaleTimeSlider).domain());
+        focus.selectAll(".circlesChart")
+            .attr("cx", d => xScale(d.postedDate))
+            .attr("cy", d => yScale(d.postsPerDay));
+        focus.select(".axis--x").call(xAxis);
+        context.select(".brush").call(brush.move, xScale.range().map(t.invertX, t));
+    }
+
+
 
 
 
