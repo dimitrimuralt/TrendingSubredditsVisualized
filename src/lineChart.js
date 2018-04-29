@@ -6,9 +6,11 @@ const svg = d3.select("body").append("svg")
     .style("border", "1px solid");
 
 // Calculate the width and height depending on margins.
-const margin = {top: 50, right: 80, bottom: 100, left: 100};
+const margin = {top: 50, right: 80, bottom: 200, left: 100};
+const marginTimeSlider = {top: 520, right: 80, bottom: 30, left: 100};
 const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
+const heightTimeSlider = canvHeight - marginTimeSlider.top - marginTimeSlider.bottom;
 
 // Create parent group and add left and top margin
 const chartOuterGroup = svg.append("g")
@@ -18,12 +20,15 @@ const chartOuterGroup = svg.append("g")
 
 
 const chartInnerGroup = chartOuterGroup.append("g");
+
+/*
 //add dummy rect so that the cahrt becomes selectable when zooming
 var view = chartInnerGroup.append("rect")
     .attr("width", canvWidth)
     .attr("height", canvHeight)
     .attr("fill","white")
 ;
+*/
 
 const colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -60,26 +65,47 @@ function analyze(error, posts, postDetails) {
     });
 
     // Define the value domains
-    const dateDomain = d3.extent(posts, function (d) {
-        return d.postedDate;
-    });
+    const dateDomain = d3.extent(posts, function (d) {return d.postedDate; });
     const postsDomain = d3.extent(posts, d => Number(d.postsPerDay));
-
     // Create scales for x and y direction
-    var xScale = d3.scaleTime()
-        .range([0, width])
-        .domain(dateDomain)
-        .nice(10);
-    var yScale = d3.scaleLinear()
-        .rangeRound([height, 0])
-        .domain(postsDomain)
-        .nice(10);
+    var xScale =           d3.scaleTime()  .range([0, width])                .domain(dateDomain) .nice(10);
+    var xScaleTimeSlider = d3.scaleTime()  .range([0, width])                .domain(dateDomain) .nice(10);
+    var yScale =           d3.scaleLinear().rangeRound([height, 0])          .domain(postsDomain).nice(10);
+    var yScaleTimeSlider = d3.scaleLinear().rangeRound([heightTimeSlider, 0]).domain(postsDomain).nice(10);
 
     // Create xAxis
     var xAxis = d3.axisBottom(xScale);
+    var xAxisTimeSlider = d3.axisBottom(xScaleTimeSlider);
+    var yAxis = d3.axisLeft(yScale);
 
-    chartOuterGroup
-        .append("g")  // create a group and add axis
+    var brush = d3.brushX()
+        .extent([[0, 0], [width, heightTimeSlider]])
+   //     .on("brush end", brushed)
+    ;
+
+    var zoom = d3.zoom()
+        .scaleExtent([1, 6])
+        .translateExtent([[0, 0], [width, height]])
+        .extent([[0, 0], [width, height]])
+    //    .on("zoom", zoomed)
+    ;
+
+    //todo: read documentation
+    svg.append("defs").append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+
+    var focus = svg.append("g")
+        .attr("class", "focus")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var context = svg.append("g")
+        .attr("class", "context")
+        .attr("transform", "translate(" + marginTimeSlider.left + "," + marginTimeSlider.top + ")");
+
+    focus.append("g")
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis
             .tickFormat(d3.timeFormat("%Y-%m-%d")))
@@ -90,15 +116,12 @@ function analyze(error, posts, postDetails) {
         .attr("transform", "rotate(-65)")
     ;
 
-    // Create yAxis
-    var yAxis = d3.axisLeft(yScale);
 
-    chartOuterGroup
-        .append("g")  // create a group and add axis
+    focus.append("g")
         .call(yAxis);
 
     // Text label for the y axis
-    chartOuterGroup.append("text")
+    focus.append("text")
         .attr("transform", "rotate(-90)")
         .attr("y", 0 - margin.left / 1.5)
         .attr("x", 0 - (height / 2))
@@ -108,54 +131,68 @@ function analyze(error, posts, postDetails) {
         .text("Posts per day");
 
     // Text label for the x axis
-    chartOuterGroup.append("text")
+    focus.append("text")
         .attr("y", height + margin.bottom / 1.5)
         .attr("x", width / 2)
         .attr("dy", "1em")
         .attr("font-family", "sans-serif")
         .style("text-anchor", "middle")
-        .text("Date");
-
-
-    //create line generator
-    const line = d3.line()
-        .x(function (d) {
-            return xScale(d.postedDate);
-        })
-        .y(function (d) {
-            return yScale(d.postsPerDay);
-        })
-        .curve(d3.curveCardinal)
+        //.text("Date")
     ;
+    //create line generator
+    const lineChart = d3.line()
+        .x(function (d) { return xScale(d.postedDate);})
+        .y(function (d) { return yScale(d.postsPerDay);})
+        .curve(d3.curveCardinal) ;
 
     // group date by subreddit
     const nestedBySubreddit = d3.nest()
-        .key(function (d) {
-            return d.subredditId;
-        })
+        .key(function (d) {return d.subredditId;})
         .entries(posts);
-
 
     // draw lines which connect all subreddits with the same name
     nestedBySubreddit.forEach(function (d) {
         chartInnerGroup
             .append("path")
-            .attr("d", line(d.values))
-            .attr("stroke", function () {
-                return colorScale(d.values[0].subreddit)
-            });
+            .attr("d", lineChart(d.values))
+            .attr("stroke", function () {return colorScale(d.values[0].subreddit) });
     });
-
-    // add circles
-    const dataPoint = chartInnerGroup.selectAll("circle")
+    // add circles to main chart
+    const circlesChart = focus.selectAll("circle.circlesChart")
         .data(posts)
         .enter().append("circle")
-        .attr("cx", function (d) {
-            return xScale(d.postedDate);
-        })
-        .attr("cy", d => yScale(d.postsPerDay))
-        .attr("r", 4)
-        .style("fill", d => colorScale(d["subreddit"]));
+            .attr("class", "circlesChart")
+            .attr("cx", function (d) {
+                return xScale(d.postedDate);
+            })
+            .attr("cy", d => yScale(d.postsPerDay))
+            .attr("r", 4)
+            .style("fill", d => colorScale(d["subreddit"]));
+
+    //
+
+    context.append("g")
+        .attr("transform", "translate(0," + heightTimeSlider + ")")
+        .call(xAxis
+            .tickFormat(d3.timeFormat("%Y-%m")))
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        //todo clean up translate
+        .attr("transform", "translate(" + 30 + "," + 5 + ")");
+    ;
+
+    const circlesTimeScale = context.selectAll("circle.circlesTimeScale")
+        .data(posts)
+        .enter().append("circle")
+            .attr("class", "circlesTimeScale")
+            .attr("cx", function (d) {
+                return xScaleTimeSlider(d.postedDate);
+            })
+            .attr("cy", d => yScaleTimeSlider(d.postsPerDay))
+            .attr("r", 1)
+        ;
 
 
 
@@ -164,7 +201,7 @@ function analyze(error, posts, postDetails) {
     tooltip.style("visibility", "hidden");
     const dayFormatter = d3.timeFormat("%A, %d. %B %Y%");
 
-    dataPoint
+    circlesChart
         .on("mouseover", function (d, i) {
             tooltip
                 .html(`Subreddit: ${d["subreddit"]}<br/>`
@@ -179,7 +216,7 @@ function analyze(error, posts, postDetails) {
         });
 
     // show post details on click
-    dataPoint
+    circlesChart
         .on("click", function (d) {
             //todo: combine the two filters (date and subreddit) into one
             var postsToShow = postDetails.filter(function(post) {
@@ -203,6 +240,7 @@ function analyze(error, posts, postDetails) {
         });
 
 
+/*
     chartInnerGroup.call(d3.zoom()
         .scaleExtent([1, 20])
         .translateExtent([[0, 0], [width, height]])
@@ -213,7 +251,7 @@ function analyze(error, posts, postDetails) {
     }));
 
 
-
+*/
 
 
 
