@@ -112,6 +112,11 @@ function analyze(error, posts, postDetails) {
         .style("text-anchor", "middle")
         //.text("Date")
     ;
+    // group date by subreddit
+    var nestedBySubreddit = d3.nest()
+        .key(function (d) {return d.subredditId;})
+        .entries(posts);
+
 
     // add circles to main chart
     var circlesChart = focus.selectAll("circle.circlesChart")
@@ -148,10 +153,22 @@ function analyze(error, posts, postDetails) {
         .on("click", function (d) {
             //todo: combine the two filters (date and subreddit) into one
             var postsToShow = postDetails.filter(function(post) {
-                return  post.postedDate.getTime()  === d.postedDate.getTime();
+                return  post.subreddit  === d.subreddit;
             });
+
+
+            focus.selectAll("circle")
+                .attr("r", 4)
+                .style("opacity", 0.7);
+
+            focus.selectAll("circle").transition().duration(750)
+                .filter(d => d.subreddit === postsToShow[0].subreddit)
+                .attr("r", 6)
+                .style("opacity", 1);
+
+
             postsToShow = postsToShow.filter(function(postsToShow) {
-                return  postsToShow.subreddit  === d.subreddit;
+                return  postsToShow.postedDate.getTime()  === d.postedDate.getTime();
             });
 
             d3.selectAll(".postsContainer").html("");
@@ -169,13 +186,13 @@ function analyze(error, posts, postDetails) {
 
 
 
-    //Source: https://bl.ocks.org/mbostock/34f08d5e11952a80609169b7917d4172
+    //Source: https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
     function brushended() {
         var s = d3.event.selection;
         if (!s) {
             if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-            xScale.domain(dateDomain);
-            yScale.domain(postsDomain);
+            xScale.domain(dateDomain).nice(10);
+            yScale.domain(postsDomain).nice(10);
         } else {
             xScale.domain([s[0][0], s[1][0]].map(xScale.invert, xScale));
             yScale.domain([s[1][1], s[0][1]].map(yScale.invert, yScale));
@@ -195,6 +212,7 @@ function analyze(error, posts, postDetails) {
         svg.selectAll("circle").transition(t)
             .attr("cx", d => xScale(d.postedDate))
             .attr("cy", d => yScale(d.postsPerDay))
+
         ;
     }
 
