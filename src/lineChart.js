@@ -12,23 +12,6 @@ const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
 const heightTimeSlider = canvHeight - marginTimeSlider.top - marginTimeSlider.bottom;
 
-// Create parent group and add left and top margin
-const chartOuterGroup = svg.append("g")
-    //.attr("id", "chart-area")
-    .attr("transform", "translate(" +margin.left + "," + margin.top + ")");
-
-
-
-const chartInnerGroup = chartOuterGroup.append("g");
-
-/*
-//add dummy rect so that the cahrt becomes selectable when zooming
-var view = chartInnerGroup.append("rect")
-    .attr("width", canvWidth)
-    .attr("height", canvHeight)
-    .attr("fill","white")
-;
-*/
 
 const colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
@@ -75,9 +58,9 @@ function analyze(error, posts, postDetails) {
 
     // Create xAxis
     var xAxis = d3.axisBottom(xScale);
-    var xAxisTimeSlider = d3.axisBottom(xScaleTimeSlider);
     var yAxis = d3.axisLeft(yScale);
 
+    // see also https://github.com/d3/d3-brush
     var brush = d3.brushX()
         .extent([[0, 0], [width, heightTimeSlider]])
         .on("brush end", brushed)
@@ -205,6 +188,7 @@ function analyze(error, posts, postDetails) {
             .attr("cx", d => xScaleTimeSlider(d.postedDate))
             .attr("cy", d => yScaleTimeSlider(d.postsPerDay))
             .attr("r", 1)
+            .style("fill", d => colorScale(d["subreddit"]));
         ;
 
     context.append("g")
