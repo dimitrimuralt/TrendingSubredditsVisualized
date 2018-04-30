@@ -66,11 +66,21 @@ function analyze(error, posts, postDetails) {
 
     var focus = svg.append("g")
         .attr("class", "focus")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        ;
 
+    // brush area
     focus.append("g")
         .attr("class", "brush")
         .call(brush)
+    ;
+
+    //brush d3 v4 bug : brush area size cannot be modified, here the rect
+    // created by brush is altered manually
+    //https://stackoverflow.com/questions/48815355/d3-js-v4-brushy-cant-change-overlay-width
+    svg.selectAll("rect")
+        .attr("width", width)
+        .attr("height", height)
     ;
 
     focus.append("g")
@@ -184,8 +194,6 @@ function analyze(error, posts, postDetails) {
 
         });
 
-
-
     //Source: https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
     function brushended() {
         var s = d3.event.selection;
@@ -196,7 +204,7 @@ function analyze(error, posts, postDetails) {
         } else {
             xScale.domain([s[0][0], s[1][0]].map(xScale.invert, xScale));
             yScale.domain([s[1][1], s[0][1]].map(yScale.invert, yScale));
-           // svg.select(".brush").call(brush.move, null);
+            svg.select(".brush").call(brush.move, null);
         }
         zoom();
     }
@@ -209,14 +217,28 @@ function analyze(error, posts, postDetails) {
         var t = svg.transition().duration(750);
         svg.select(".axis--x").transition(t).call(xAxis);
         svg.select(".axis--y").transition(t).call(yAxis);
-        svg.selectAll("circle").transition(t)
-            .attr("cx", d => xScale(d.postedDate))
+
+        var minX =  xScale.domain()[0].getTime();
+        var maxX =  xScale.domain()[1].getTime();
+        var minY =  yScale.domain()[0];
+        var maxY =  yScale.domain()[1];
+
+        focus.selectAll("circle.circlesChart").transition(t)
+            .attr("cx", function(d) {
+                return xScale(d.postedDate);
+            })
             .attr("cy", d => yScale(d.postsPerDay))
-
+            .style("opacity", function(d){
+                if(    d.postedDate.getTime() < minX
+                    || d.postedDate.getTime() > maxX
+                    || d.postsPerDay          < minY
+                    || d.postsPerDay          > maxY)
+                    return 0;
+                else return 1
+            });
         ;
+
     }
-
-
 
 
 }
