@@ -167,14 +167,35 @@ function analyze(error, posts, postDetails) {
             });
 
 
-            focus.selectAll("circle")
-                .attr("r", 4)
-                .style("opacity", 0.7);
+            var minX =  xScale.domain()[0].getTime();
+            var maxX =  xScale.domain()[1].getTime();
+            var minY =  yScale.domain()[0];
+            var maxY =  yScale.domain()[1];
 
-            focus.selectAll("circle").transition().duration(750)
+
+
+            focus.selectAll("circle.circlesChart")
+                .attr("r", 4)
+                .style("opacity", function(d){
+                if(    d.postedDate.getTime() < minX
+                    || d.postedDate.getTime() > maxX
+                    || d.postsPerDay          < minY
+                    || d.postsPerDay          > maxY)
+                    return 0;
+                else return 0.7
+            });
+
+            focus.selectAll("circle.circlesChart").transition().duration(750)
                 .filter(d => d.subreddit === postsToShow[0].subreddit)
                 .attr("r", 6)
-                .style("opacity", 1);
+                .style("opacity", function(d){
+                    if(    d.postedDate.getTime() < minX
+                        || d.postedDate.getTime() > maxX
+                        || d.postsPerDay          < minY
+                        || d.postsPerDay          > maxY)
+                        return 0;
+                    else return 1
+                });
 
 
             postsToShow = postsToShow.filter(function(postsToShow) {
@@ -201,6 +222,8 @@ function analyze(error, posts, postDetails) {
             if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
             xScale.domain(dateDomain).nice(10);
             yScale.domain(postsDomain).nice(10);
+            focus.selectAll("circle")
+                .attr("r", 4)
         } else {
             xScale.domain([s[0][0], s[1][0]].map(xScale.invert, xScale));
             yScale.domain([s[1][1], s[0][1]].map(yScale.invert, yScale));
