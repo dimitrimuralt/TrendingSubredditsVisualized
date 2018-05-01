@@ -11,6 +11,173 @@
 <div class="wrapper">
     <section id="context">
         <h1>Worklog</h1>
+
+        <h2>Datenbeschaffung</h2>
+        <p>
+            Als Grundlage für die Visualisierung wurden Rohdaten von Redditposts verwendet. Wo man diese Daten
+            findet ist in <a href="https://www.reddit.com/r/datasets/comments/5b56my/where_can_i_get_a_large_archive_of_reddit_posts/">diesem</a>
+            Redditpost beschrieben. Auf der Seite <a href="https://files.pushshift.io/reddit/">pushshift.io</a>
+            sind alle Posts und Comments seit 2005 zu finden.
+            Für dieses Projekt wurden alle Posts aus dem Jahr 2018 heruntergeladen. Leider ist die rohe Datemenge
+            zu gross im damit lokal arbeiten zu können.
+            Im Januar 2018 wurden Beispielsweise insgesamt 11'306'843 Posts veröffentlicht, dies entspricht einer Datenmenge
+            von knapp 24 GB. Um diese Datenmenge zu verarbeiten wurde Google Big Query verwendet. Hierzu mussten die Datenfiles zunächst
+            auf die Google Cloud geladen werden. Mit der vorhandenen Infrastruktur dauerte dies einige Nächte.
+            Sobald die Daten auf der Google Cloud geladen wurden, und der Aufbau eines Posts analysiert wurden,
+            konnten die Daten in eine Tabelle in GoogleBig Query geladen werden und waren somit bereit für die weitere
+            Analyse.
+
+
+
+        </p>
+
+        <h2>Datenanalyse</h2>
+            <p>
+                Das Ziel der Visualisierung ist es ja, beliebte Subreddits in einem bestimmten Zeitraum darzustellen.
+                Nun die Dimension Zeit, ist relativ klar und einfach herauszufinden, da jeder Post über ein Attribut
+                created_utc verfügt. Was jedoch einen Subreddit beliebt macht, bedurfte einer eingehenden Analyse.
+            </p>
+            <br>
+            <p>
+                Ein Subreddit ist eine Bezeichnung für ein Thema zu welchem sogenannte Posts geschrieben werden können.
+                Zu einem Post kann man zudem Comments schreiben. Sowohl ein Post wie ein Comments verfügen über einen Score.
+                Dieser Score setzt sich zusammen aus "Upvotes" minus "Downvotes" und besteht also aus einer einzigen Zahl.
+                Es ist jedoch nicht ersichtlich wie viele Upvotes und Downvotes ingesamt pro Post vergeben wurden und
+                wann diese vergeben wurden.
+            </p>
+            <br>
+            <p>
+                Aussagekräftigeres Kriterium für die Popularität eines Subreddit ist die Anzahl Posts, die zu einem
+                bestimmten Subreddit geschrieben wurden. Dabei lässt sich auch der Zeitpunkt der Popularität genau bestimmen,
+                denn ein Post verfügt wie oben erwähnt über eine Timestamp.
+
+                Nach vielen Vesuchen lieferte der unten dargestellte Query ein zufriedenstellendes Resultat.
+                Mithilfe einer OLAP Funktion gelang es die zehn beliebtesten Posts pro Tag zu ermitteln.
+                Dabei werden alle Posts erstellt an einem bestimmten Tag angeschaut, auf Subreddit Ebene gruppiert
+                und somit eine Rangliste mit der Anzahl Posts zu einem bestimmten Subreddit je Tag erstellt.
+                Das Resultat des Query also zehn Subreddit pro Datum mit den Attributen Subredditbezeichnung, Subreddit-Id,
+                Score (Anzahl Posts an diesem Tag), Post-Zeitpunkt und der Rang innerhalb des jeweiligen Tages.
+            <p>
+                <code>
+                    <pre>
+                        WITH postsPerDayCount as
+                        (
+                        SELECT count(*) as postsPerDay
+                        , subreddit
+                        , subreddit_id as subredditId
+                        , sum(score) as totalScore
+                        , date(created_utc) as postedDate
+
+                        FROM
+                        reddit.submissions_all
+                        GROUP BY
+                        postedDate
+                        , SUBREDDIT
+                        , subreddit_id
+                        ORDER BY
+                        postedDate
+                        ,postsPerDay desc
+                        ),
+
+
+                        temp as (
+                        select
+                        postsPerDay
+                        , subreddit
+                        , subredditId
+                        , totalScore
+                        , postedDate
+                        , ROW_NUMBER() over (
+                        partition by postedDate
+                        order by postedDate, postsPerDay desc) as rn
+                        FROM postsPerDayCount posts
+                        )
+                        select
+                        postsPerDay
+                        , subreddit
+                        , subredditId
+                        , totalScore
+                        , postedDate
+                        , rn as rank
+                        from temp
+                        where rn <= 10
+                    </pre>
+                </code>
+                <img src="../pictures/SubredditsQueryResult.PNG" alt="Subreddit Query Result">
+                <p>
+                Diese Daten stellen eine Übersicht dar. Ziel der Visualisierung ist es, in den Posts stöbern zu können
+                und etwas über deren Inhalt erfahren zu können. Hier für wurde ein weiterer Query geschrieben, welcher
+                für jeden der zehn Datenpunkte pro Tag, die 3 beliebtesten Posts liefert. Hierzu wurde nun der eingentliche
+                Score der einzelnen Posts verwendet, da keine Aggregation auf Posteben mehr möglich ist.
+
+
+                <p>
+
+                <code>
+                    <pre>
+                        Select * from
+                        (
+                        Select
+                        alle.title
+                        ,alle.id
+                        ,alle.url
+                        ,alle.permalink
+                        ,alle.selftext
+                        ,alle.thumbnail
+                        ,date(alle.created_utc) date
+                        ,time(alle.created_utc) time
+                        ,alle.is_self
+                        ,alle.score
+                        ,alle.author
+                        ,alle.subreddit
+                        ,alle.subreddit_id
+                        ,ROW_NUMBER() over (
+                        partition by alle.subreddit, date(alle.created_utc)
+                        order by alle.subreddit, date(alle.created_utc),alle.score desc) as rn
+
+                        from `reddit.submissions_all` alle
+                        inner join `reddit.topSubredditsByDate` top
+                        on    date(alle.created_utc) = top.postedDate
+                        and  alle.subreddit_id = top.subredditId
+                        ) temp
+
+                        where rn <= 3
+                        order by temp.date, temp.subreddit, temp.rn
+                    </pre>
+                </code>
+
+            <p>
+                Die beiden Datensätze wurden anschliessend in einem von GoogleQuery zur Verfügung gestellten ndjson Format
+                exportiert und waren somit bereit für die weitere Verarbeitung.
+            </p>
+
+        <h2>Visualisierung</h2>
+        <p>V1 Chrigi : siehe Grundlage? etc.</p>
+        <img src="../pictures/Version_2018-04-21_21-05-14.png" alt="Version 1 Visualisierung">
+        <p>
+            Als erste Erweiterung wurden die Zusammengehörigen Subreddits mit einer Linie verbunden,
+            damit die Veränderung über die Zeit besser ersichtlich ist. Hierzu mussten die Subreddits
+            mit der d3 nest() Funktion auf Subreddit Ebene aggregiert werden.
+
+            Zudem wurde das zweite File mit den Details  eines Posts eingelesen und mit den Datenpunkten gemappt.
+            Somit konnten beim Klick auf einen Kreis die drei beliebtesten Posts des Subreddit am jeweiligen Tag angezeigt werden.
+        </p>
+        <img src="../pictures/Version_2018-04-28_19-40-00_part.PNG" alt="Version 2 Visualisierung">
+
+
+        <p>
+            Viele Datenpunkte befinden sich sehr nahe bei einander und können so nicht ausgewählt werden. Die nächste
+            Funktionalität stellte somit das Zoomen dar. In einer ersten Version wurde ein eindimensionaler Zoom mithilfe
+            einer zweiten Sicht dargestellt. Dabei konnte das Datum auf der x-Achse eingegrent werden. Diese Implementierung
+            wurde anschliessend jedoch verworfen, da ein Zoom auf der y-Achse ebenfalls nötig war. Die Steuerung der y-Achse
+            über die kleine Ansicht erschien als unhandlich und erwies sich auch in der Implementierung als etwas anspruchsvoll.
+        <p>
+            Somit wurde der die Steuerung des Zooms per Auswahl direkt in der Grafik umgesetzt.
+        <p>
+        </p>
+        <img src="../pictures/Version_2018-04-28_15-40-00_part.PNG" alt="Version 3 Visualisierung">
+
+
         <h2>Grundlage</h2>
         <p>
             Als Grundlage für unser Projekt haben wir unser Scatterplot aus einer früheren Übung benutzt.
