@@ -32,8 +32,8 @@ d3.queue()
 
 function analyze(error, posts, postDetails) {
     if(error) { console.log(error); }
-     // Format the date
 
+     // Format the date
     const parseDate = d3.timeParse("%Y-%m-%d");
 
     posts.forEach(function (posts) {
@@ -69,15 +69,15 @@ function analyze(error, posts, postDetails) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         ;
 
-    // brush area
+    // Brush area
     focus.append("g")
         .attr("class", "brush")
         .call(brush)
     ;
 
-    //brush d3 v4 bug : brush area size cannot be modified, here the rect
+    // Brush d3 v4 bug : brush area size cannot be modified, here the rect
     // created by brush is altered manually
-    //https://stackoverflow.com/questions/48815355/d3-js-v4-brushy-cant-change-overlay-width
+    // https://stackoverflow.com/questions/48815355/d3-js-v4-brushy-cant-change-overlay-width
     svg.selectAll("rect")
         .attr("width", width)
         .attr("height", height)
@@ -88,6 +88,11 @@ function analyze(error, posts, postDetails) {
         .attr("transform", "translate(0," + height + ")")
         .call(xAxis
             .tickFormat(d3.timeFormat("%Y-%m-%d")))
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-65)");
 /*
         .selectAll("text")
         .style("text-anchor", "end")
@@ -120,15 +125,15 @@ function analyze(error, posts, postDetails) {
         .attr("dy", "1em")
         .attr("font-family", "sans-serif")
         .style("text-anchor", "middle")
-        //.text("Date")
+        .text("Date")
     ;
-    // group date by subreddit
+    // Group date by subreddit
     var nestedBySubreddit = d3.nest()
         .key(function (d) {return d.subredditId;})
         .entries(posts);
 
 
-    // add circles to main chart
+    // Add circles to main chart
     var circlesChart = focus.selectAll("circle.circlesChart")
         .data(posts)
         .enter().append("circle")
@@ -158,10 +163,9 @@ function analyze(error, posts, postDetails) {
             tooltip.style("visibility", "hidden")
         });
 
-    // show post details on click
+    // Show post details on click
     circlesChart
         .on("click", function (d) {
-            //todo: combine the two filters (date and subreddit) into one
             var postsToShow = postDetails.filter(function(post) {
                 return  post.subreddit  === d.subreddit;
             });
@@ -238,13 +242,20 @@ function analyze(error, posts, postDetails) {
 
     function zoom() {
         var t = svg.transition().duration(750);
-        svg.select(".axis--x").transition(t).call(xAxis);
+        svg.select(".axis--x").transition(t).call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-65)");;
         svg.select(".axis--y").transition(t).call(yAxis);
+
 
         var minX =  xScale.domain()[0].getTime();
         var maxX =  xScale.domain()[1].getTime();
         var minY =  yScale.domain()[0];
         var maxY =  yScale.domain()[1];
+
 
         focus.selectAll("circle.circlesChart").transition(t)
             .attr("cx", function(d) {
@@ -262,6 +273,5 @@ function analyze(error, posts, postDetails) {
         ;
 
     }
-
 
 }
