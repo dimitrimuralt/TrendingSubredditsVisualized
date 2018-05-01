@@ -6,7 +6,7 @@ const svg = d3.select("body").append("svg")
     .style("border", "1px solid");
 
 // Calculate the width and height depending on margins.
-const margin = {top: 50, right: 80, bottom: 200, left: 100};
+const margin = {top: 50, right: 80, bottom: 120, left: 100};
 const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
 
