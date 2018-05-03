@@ -1,3 +1,20 @@
+svg {
+    float: left;
+}
+
+/* Reset h1 style */
+h1 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+}
+
 div.tooltip {
     position: absolute;
     text-align: left;
@@ -12,23 +29,43 @@ div.tooltip {
     pointer-events: none;
 }
 
-path {
-    fill: none;
-    stroke-width: 1px;
+.postsRelated {
+    margin: 20px;
+    float: left;
+    min-width: 200px;
+    max-width: 600px;
+}
+
+.postsRelated > h1 {
+    align: center;
+    font-size: 24px;
+    font-family: sans-serif;
 }
 
 .postsContainer {
-    display: -webkit-flex;
-    display: flex;
+    margin-top: 20px;
 }
 
 .postsContainer > div {
-    -webkit-flex: 1;
-    -ms-flex: 1;
-    flex: 1;
     padding: 10px;
+    margin: 20px;
+    border-style: solid;
+    border-width: thin;
+    border-color: #555555;
+    background: #CEE3F8;
+    min-width: 200px;
+    max-width: 600px;
 }
 
+.postsContainer > div > .subbredit {
+    font-weight: bold;
+    text-align: center;
+}
+
+.postsContainer > div > .date {
+    text-align: center;
+    font-style: italic;
+}
 .zoom {
     cursor: move;
     fill: none;

@@ -211,7 +211,7 @@ function analyze(error, posts, postDetails) {
                 function (d) {
                     d3.selectAll(".postsContainer")
                       .append("div")
-                      .html(d.subreddit + ': ' + d.postedDate.toDateString() + '<br/>'
+                      .html('<p class="subbredit">' + d.subreddit + '</p>' + '<p class="date">' + d.postedDate.toDateString() + '</p>'
                           + d.title     + '<br/>'
                           );
                 }
