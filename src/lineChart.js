@@ -212,16 +212,45 @@ function analyze(error, posts, postDetails) {
                 return  postsToShow.postedDate.getTime()  === d.postedDate.getTime();
             });
 
+
+            // Clear Container before displaying new data
             d3.selectAll(".postsContainer").html("");
+
+            d3.selectAll(".postsContainer")
+                .append("div")
+                .html('<h1 class="">Top 3 upvoted posts on ' + d.subreddit + '</h1><br>'
+                + '<h2 class="date">' + dayFormatter(d.postedDate) + '</h2>'
+                );
+
             postsToShow.forEach(
                 function (d) {
                     d3.selectAll(".postsContainer")
                       .append("div")
-                      .html('<p class="subbredit">' + d.subreddit + '</p>' +
-                          '<p class="date">' + d.postedDate.toDateString() + '</p>'+
-                          d.title     + '<br/>'+
-                          '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a>'
+                        .attr("class", "postItem")
+                      .html(function() {
+                              if (d.thumbnail === "self" || d.thumbnail === "default" || d.thumbnail === "nsfw") {
+                                  return '<p class="postText"><span class="author">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
+                                      + d.title + '<br/>' +
+                                      '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>';
+                              }
+                              else {
+                                  return '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><img class="postThumbnail" src="' + d.thumbnail + '"></a>'
+                                      + '<p class="postText"> <span class="author">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
+                                      + d.title + '<br/>' +
+                                      '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>';
+                              }
+                          }
                           );
+
+                    /*
+                                              '<img class="postThumbnail" src="' + d.thumbnail + '">' +
+                          '<p class="postText">Author: ' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
+                          + d.title + '<br/>'+
+                          '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
+                          );
+                     */
+
+
                 }
             );
         });

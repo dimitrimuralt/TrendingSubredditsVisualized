@@ -18,6 +18,19 @@ h1 {
     vertical-align: baseline;
 }
 
+/* Reset h2 style */
+h2 {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-weight: inherit;
+    font-style: inherit;
+    font-size: 100%;
+    font-family: inherit;
+    vertical-align: baseline;
+}
+
 div.tooltip {
     position: absolute;
     text-align: left;
@@ -39,7 +52,7 @@ div.tooltip {
     max-width: 600px;
 }
 
-.postsRelated > h1 {
+.postsContainer > div > h1 {
     align: center;
     font-size: 24px;
     font-family: sans-serif;
@@ -49,7 +62,7 @@ div.tooltip {
     margin-top: 20px;
 }
 
-.postsContainer > div {
+.postsContainer > .postItem {
     position: relative;
     padding: 10px;
     margin: 20px;
@@ -59,18 +72,27 @@ div.tooltip {
     background: #CEE3F8;
     min-width: 200px;
     max-width: 600px;
+    overflow: auto;
 }
 
-.postsContainer > div > .subbredit {
+.postsContainer > div > p > .author {
     font-weight: bold;
-    text-align: center;
-
 }
 
 .postsContainer > div > .date {
+    font-size: 20px;
     text-align: center;
     font-style: italic;
 }
+
+.postThumbnail {
+    padding-right: 10px;
+    float: left;
+}
+
+.postsContainer > div > .postText {
+}
+
 .zoom {
     cursor: move;
     fill: none;
