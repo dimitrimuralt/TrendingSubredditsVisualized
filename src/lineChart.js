@@ -10,7 +10,6 @@ const margin = {top: 50, right: 80, bottom: 120, left: 100};
 const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
 
-
 const colorScale = d3.scaleOrdinal(d3.schemeCategory20);
 
 // Create the chart title
@@ -22,7 +21,6 @@ svg.append("text")
     .attr("font-size", "24px")
     .style("text-anchor", "left")
     .text("Most popular Subreddits");
-
 
 d3.queue()
     .defer(d3.json, "./data/posts.json")
@@ -102,8 +100,6 @@ function analyze(error, posts, postDetails) {
   */
     ;
 
-
-
     focus.append("g")
         .attr("class", "axis axis--y")
         .call(yAxis);
@@ -132,7 +128,6 @@ function analyze(error, posts, postDetails) {
         .key(function (d) {return d.subredditId;})
         .entries(posts);
 
-
     // Add circles to main chart
     var circlesChart = focus.selectAll("circle.circlesChart")
         .data(posts)
@@ -142,7 +137,6 @@ function analyze(error, posts, postDetails) {
             .attr("cy", d => yScale(d.postsPerDay))
             .attr("r", 4)
             .style("fill", d => colorScale(d["subreddit"]));
-
 
     // Create tooltip
     const tooltip = d3.select("body").append("div").classed("tooltip", true);
@@ -170,13 +164,10 @@ function analyze(error, posts, postDetails) {
                 return  post.subreddit  === d.subreddit;
             });
 
-
             var minX =  xScale.domain()[0].getTime();
             var maxX =  xScale.domain()[1].getTime();
             var minY =  yScale.domain()[0];
             var maxY =  yScale.domain()[1];
-
-
 
             focus.selectAll("circle.circlesChart")
                 .attr("r", 4)
@@ -186,7 +177,7 @@ function analyze(error, posts, postDetails) {
                     || d.postsPerDay          < minY
                     || d.postsPerDay          > maxY)
                     return 0;
-                else return 0.7
+                else return 0.3
             });
 
             focus.selectAll("circle.circlesChart").transition().duration(750)
@@ -211,12 +202,13 @@ function analyze(error, posts, postDetails) {
                 function (d) {
                     d3.selectAll(".postsContainer")
                       .append("div")
-                      .html('<p class="subbredit">' + d.subreddit + '</p>' + '<p class="date">' + d.postedDate.toDateString() + '</p>'
+                      .html('<p class="subbredit">' + d.subreddit + '</p>' +
+                          '<p class="date">' + d.postedDate.toDateString() + '</p>'
                           + d.title     + '<br/>'
+                          + '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"> Link to Post</a>'
                           );
                 }
             );
-
         });
 
     //Source: https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
@@ -250,12 +242,10 @@ function analyze(error, posts, postDetails) {
             .attr("transform", "rotate(-65)");;
         svg.select(".axis--y").transition(t).call(yAxis);
 
-
         var minX =  xScale.domain()[0].getTime();
         var maxX =  xScale.domain()[1].getTime();
         var minY =  yScale.domain()[0];
         var maxY =  yScale.domain()[1];
-
 
         focus.selectAll("circle.circlesChart").transition(t)
             .attr("cx", function(d) {
@@ -271,7 +261,5 @@ function analyze(error, posts, postDetails) {
                 else return 1
             });
         ;
-
     }
-
 }
