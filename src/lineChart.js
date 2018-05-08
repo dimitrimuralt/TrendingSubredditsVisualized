@@ -203,9 +203,9 @@ function analyze(error, posts, postDetails) {
                     d3.selectAll(".postsContainer")
                       .append("div")
                       .html('<p class="subbredit">' + d.subreddit + '</p>' +
-                          '<p class="date">' + d.postedDate.toDateString() + '</p>'
-                          + d.title     + '<br/>'
-                          + '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"> Link to Post</a>'
+                          '<p class="date">' + d.postedDate.toDateString() + '</p>'+
+                          d.title     + '<br/>'+
+                          '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a>'
                           );
                 }
             );

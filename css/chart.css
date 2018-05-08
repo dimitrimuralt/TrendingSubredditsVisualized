@@ -47,6 +47,7 @@ div.tooltip {
 }
 
 .postsContainer > div {
+    position: relative;
     padding: 10px;
     margin: 20px;
     border-style: solid;
@@ -60,6 +61,7 @@ div.tooltip {
 .postsContainer > div > .subbredit {
     font-weight: bold;
     text-align: center;
+
 }
 
 .postsContainer > div > .date {
@@ -70,4 +72,15 @@ div.tooltip {
     cursor: move;
     fill: none;
     pointer-events: all;
+}
+
+.fa-external-link {
+    color: #555555;
+}
+
+.topright {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 22px;
 }
