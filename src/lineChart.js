@@ -228,28 +228,20 @@ function analyze(error, posts, postDetails) {
                       .append("div")
                         .attr("class", "postItem")
                       .html(function() {
-                              if (d.thumbnail === "self" || d.thumbnail === "default" || d.thumbnail === "nsfw") {
-                                  return '<p class="postText"><span class="author">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
-                                      + d.title + '<br/>' +
-                                      '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>';
-                              }
-                              else {
-                                  return '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><img class="postThumbnail" src="' + d.thumbnail + '"></a>'
-                                      + '<p class="postText"> <span class="author">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
-                                      + d.title + '<br/>' +
-                                      '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>';
-                              }
+                          if (d.thumbnail === "self" || d.thumbnail === "default" || d.thumbnail === "nsfw") {
+                              return '';
                           }
+                          else {
+                              return '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><img class="postThumbnail" src="' + d.thumbnail + '"></a>';
+                          }})
+                        .append("div")
+                        .attr("class", "postBody")
+                        .html(
+                              '<p class="postText"> <span class="postAuthor">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>' +
+                            ' <span class="postPoints">Points: </span>' + d.score + '<br/>'
+                              + d.title + '<br/>' +
+                              '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
                           );
-
-                    /*
-                                              '<img class="postThumbnail" src="' + d.thumbnail + '">' +
-                          '<p class="postText">Author: ' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
-                          + d.title + '<br/>'+
-                          '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
-                          );
-                     */
-
 
                 }
             );

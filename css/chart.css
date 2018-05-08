@@ -75,7 +75,11 @@ div.tooltip {
     overflow: auto;
 }
 
-.postsContainer > div > p > .author {
+.postAuthor {
+    font-weight: bold;
+}
+
+.postPoints {
     font-weight: bold;
 }
 
@@ -88,9 +92,6 @@ div.tooltip {
 .postThumbnail {
     padding-right: 10px;
     float: left;
-}
-
-.postsContainer > div > .postText {
 }
 
 .zoom {
