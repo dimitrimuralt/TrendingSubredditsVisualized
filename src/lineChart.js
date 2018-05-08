@@ -128,6 +128,21 @@ function analyze(error, posts, postDetails) {
         .key(function (d) {return d.subredditId;})
         .entries(posts);
 
+    //create line generator
+    const line = d3.line()
+        .x(function (d) {return xScale(d.postedDate);})
+        .y(function (d) {return yScale(d.postsPerDay);})
+        .curve(d3.curveCardinal)
+    ;
+
+    // draw lines which connect all subreddits with the same name
+    nestedBySubreddit.forEach(function (d) {
+        focus
+            .append("path")
+            .attr("d",line(d.values))
+            .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
+    });
+
     // Add circles to main chart
     var circlesChart = focus.selectAll("circle.circlesChart")
         .data(posts)
@@ -261,5 +276,14 @@ function analyze(error, posts, postDetails) {
                 else return 1
             });
         ;
+
+        focus.selectAll("path").remove();
+
+        nestedBySubreddit.forEach(function (d) {
+            focus
+                .append("path").transition(t)
+                .attr("d",line(d.values))
+                .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
+        });
     }
 }
