@@ -62,18 +62,7 @@ function analyze(error, posts, postDetails) {
         idleDelay = 350
     ;
 
-    var focus = svg.append("svg")
-            .attr("width", 624)
-            .attr("height", 431)
-        .attr("class", "focus")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-        ;
 
-    // Brush area
-    focus.append("g")
-        .attr("class", "brush")
-        .call(brush)
-    ;
 
     // Brush d3 v4 bug : brush area size cannot be modified, here the rect
     // created by brush is altered manually
@@ -85,8 +74,6 @@ function analyze(error, posts, postDetails) {
 
     svg.append("g")
         .attr("class", "axis axis--x")
-  //      .attr("transform", "translate(0," + height + ")")
-//        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .attr("transform", "translate(" + margin.left + "," + (height+margin.top) + ")")
         .call(xAxis
             .tickFormat(d3.timeFormat("%Y-%m-%d")))
@@ -101,6 +88,23 @@ function analyze(error, posts, postDetails) {
         .attr("class", "axis axis--y")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .call(yAxis);
+
+    var xAxisWidth = svg.selectAll("g.axis--x").selectAll("path.domain").node().getBoundingClientRect();
+    var yAxisHeight = svg.selectAll("g.axis--y").selectAll("path.domain").node().getBoundingClientRect();
+
+    var focus = svg.append("svg")
+        //624
+            .attr("width", xAxisWidth.width)
+            .attr("height", yAxisHeight.height - 3)
+            .attr("class", "focus")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+    ;
+
+    // Brush area
+    focus.append("g")
+        .attr("class", "brush")
+        .call(brush)
+    ;
 
     // Text label for the y axis
     focus.append("text")
@@ -121,12 +125,13 @@ function analyze(error, posts, postDetails) {
         .style("text-anchor", "middle")
         .text("Date")
     ;
+
     // Group date by subreddit
     var nestedBySubreddit = d3.nest()
         .key(function (d) {return d.subredditId;})
         .entries(posts);
 
-    //create line generator
+    // Create line generator
     const line = d3.line()
         .x(function (d) {return xScale(d.postedDate);})
         .y(function (d) {return yScale(d.postsPerDay);})
@@ -134,10 +139,10 @@ function analyze(error, posts, postDetails) {
     ;
 
     // draw lines which connect all subreddits with the same name
-    nestedBySubreddit.forEach(function (d) {
-        focus
+        nestedBySubreddit.forEach(function (d) {
+            focus
             .append("path")
-            .attr("id","connectorLines")
+            .attr("class","connectorLine")
             .attr("d",line(d.values))
             .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
     });
@@ -206,7 +211,6 @@ function analyze(error, posts, postDetails) {
                         return 0;
                     else return 1
                 });
-
 
             postsToShow = postsToShow.filter(function(postsToShow) {
                 return  postsToShow.postedDate.getTime()  === d.postedDate.getTime();
@@ -298,14 +302,14 @@ function analyze(error, posts, postDetails) {
             });
         ;
 
-        focus.selectAll("#connectorLines").remove();
+        focus.selectAll("path.connectorLine").remove();
         setTimeout(function(){
             nestedBySubreddit.forEach(function (d) {
                 focus
                     .append("path").transition(t)
-                    .attr("id","connectorLines")
+                    .attr("class","connectorLine")
                     .attr("d",line(d.values))
-                    .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
+                    .attr("stroke", function (){return colorScale(d.values[0].subreddit)})
         });
         }, 1000);
     }
