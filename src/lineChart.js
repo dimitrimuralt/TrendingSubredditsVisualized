@@ -62,13 +62,15 @@ function analyze(error, posts, postDetails) {
         idleDelay = 350
     ;
 
-    var focus = svg.append("g")
+    var focus = svg.append("svg")
+            .attr("width", 624)
+            .attr("height", 431)
         .attr("class", "focus")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         ;
 
     // Brush area
-    focus.append("svg")
+    focus.append("g")
         .attr("class", "brush")
         .call(brush)
     ;
@@ -81,9 +83,11 @@ function analyze(error, posts, postDetails) {
         .attr("height", height)
     ;
 
-    focus.append("g")
+    svg.append("g")
         .attr("class", "axis axis--x")
-        .attr("transform", "translate(0," + height + ")")
+  //      .attr("transform", "translate(0," + height + ")")
+//        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("transform", "translate(" + margin.left + "," + (height+margin.top) + ")")
         .call(xAxis
             .tickFormat(d3.timeFormat("%Y-%m-%d")))
         .selectAll("text")
@@ -91,17 +95,11 @@ function analyze(error, posts, postDetails) {
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
         .attr("transform", "rotate(-65)");
-/*
-        .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-65)")
-  */
     ;
 
-    focus.append("g")
+    svg.append("g")
         .attr("class", "axis axis--y")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
         .call(yAxis);
 
     // Text label for the y axis
