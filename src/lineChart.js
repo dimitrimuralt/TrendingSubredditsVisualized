@@ -68,7 +68,7 @@ function analyze(error, posts, postDetails) {
         ;
 
     // Brush area
-    focus.append("g")
+    focus.append("svg")
         .attr("class", "brush")
         .call(brush)
     ;
@@ -139,6 +139,7 @@ function analyze(error, posts, postDetails) {
     nestedBySubreddit.forEach(function (d) {
         focus
             .append("path")
+            .attr("id","connectorLines")
             .attr("d",line(d.values))
             .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
     });
@@ -171,6 +172,7 @@ function analyze(error, posts, postDetails) {
         .on("mouseout", function (d, i) {
             tooltip.style("visibility", "hidden")
         });
+
 
     // Show post details on click
     circlesChart
@@ -218,7 +220,7 @@ function analyze(error, posts, postDetails) {
 
             d3.selectAll(".postsContainer")
                 .append("div")
-                .html('<h1 class="">Top 3 upvoted posts on ' + d.subreddit + '</h1><br>'
+                .html('<h1 class="">Top 3 upvoted posts on /r/' + d.subreddit + '</h1><br>'
                 + '<h2 class="date">' + dayFormatter(d.postedDate) + '</h2>'
                 );
 
@@ -237,10 +239,10 @@ function analyze(error, posts, postDetails) {
                         .append("div")
                         .attr("class", "postBody")
                         .html(
-                              '<p class="postText"> <span class="postAuthor">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>' +
-                            ' <span class="postPoints">Points: </span>' + d.score + '<br/>'
-                              + d.title + '<br/>' +
-                              '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
+                              '<p class="postText"> <span class="postAuthor">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
+                              + ' <span class="postPoints">Points: </span>' + d.score + '<br/>'
+                              + d.title + '<br/>'
+                              + '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
                           );
 
                 }
@@ -298,13 +300,15 @@ function analyze(error, posts, postDetails) {
             });
         ;
 
-        focus.selectAll("path").remove();
-
-        nestedBySubreddit.forEach(function (d) {
-            focus
-                .append("path").transition(t)
-                .attr("d",line(d.values))
-                .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
+        focus.selectAll("#connectorLines").remove();
+        setTimeout(function(){
+            nestedBySubreddit.forEach(function (d) {
+                focus
+                    .append("path").transition(t)
+                    .attr("id","connectorLines")
+                    .attr("d",line(d.values))
+                    .attr("stroke", function (){return colorScale(d.values[0].subreddit)});
         });
+        }, 1000);
     }
 }
