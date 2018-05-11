@@ -5,7 +5,6 @@
     <title>Worklog</title>
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
-
 </head>
 <body>
 <div class="wrapper">
@@ -26,9 +25,6 @@
             Sobald die Daten auf der Google Cloud geladen wurden, und der Aufbau eines Posts analysiert wurden,
             konnten die Daten in eine Tabelle in GoogleBig Query geladen werden und waren somit bereit für die weitere
             Analyse.
-
-
-
         </p>
 
         <h2>Datenanalyse</h2>
@@ -109,8 +105,6 @@
                 und etwas über deren Inhalt erfahren zu können. Hier für wurde ein weiterer Query geschrieben, welcher
                 für jeden der zehn Datenpunkte pro Tag, die 3 beliebtesten Posts liefert. Hierzu wurde nun der eingentliche
                 Score der einzelnen Posts verwendet, da keine Aggregation auf Posteben mehr möglich ist.
-
-
                 <p>
 
                 <code>
@@ -152,8 +146,13 @@
             </p>
 
         <h2>Visualisierung</h2>
-        <p>V1 Chrigi : siehe Grundlage? etc.</p>
-        <img src="../pictures/Version_2018-04-21_21-05-14.png" alt="Version 1 Visualisierung">
+        <p>
+            Als Ausgangslage für unser Projekt haben wir unseren Scatterplot aus einer früheren Übung benutzt.
+            So konnten wir einen Teil der Code Struktur übernehmen und hatten schon mal eine gute Grundlage für das Projekt.
+            Im Zuge der Arbeit hat sich unser Projekt jedoch so viel weiterentwickelt, dass vom ursprünglichen Source Code nur noch
+            ein kleiner Teil übrig geblieben ist.
+        </p><br>
+
         <p>
             Als erste Erweiterung wurden die Zusammengehörigen Subreddits mit einer Linie verbunden,
             damit die Veränderung über die Zeit besser ersichtlich ist. Hierzu mussten die Subreddits
@@ -162,7 +161,7 @@
             Zudem wurde das zweite File mit den Details  eines Posts eingelesen und mit den Datenpunkten gemappt.
             Somit konnten beim Klick auf einen Kreis die drei beliebtesten Posts des Subreddit am jeweiligen Tag angezeigt werden.
         </p>
-        <img src="../pictures/Version_2018-04-28_19-40-00_part.PNG" alt="Version 2 Visualisierung">
+        <img src="../pictures/Version_2018-04-28_19-40-00_part.PNG" alt="Version 2 Visualisierung"> <br/><br/>
 
 
         <p>
@@ -178,15 +177,9 @@
         <img src="../pictures/Version_2018-04-28_15-40-00_part.PNG" alt="Version 3 Visualisierung">
 
 
-        <h2>Grundlage</h2>
-        <p>
-            Als Grundlage für unser Projekt haben wir unser Scatterplot aus einer früheren Übung benutzt.
-            So konnten wir einen Teil der Code Struktur übernehmen und hatten schon mal eine gute Grundlage für das Projekt.
-        </p><br>
-
         <h2>Parsing von NDJSON</h2>
         <p>
-            Die uns vorliegenden Quelldaten zu den Reddit Post und Kommentaren sind nur im NDJSON format vorhanden.
+            Die uns vorliegenden Quelldaten zu den Reddit Posts und Kommentaren sind nur im NDJSON format vorhanden.
             Leider kann d3.js von sich aus kein NDJSON einlesen. Dass dieses Format überhaupt existiert, war uns lange
             nicht bewusst.
             Auch nach einer Nachfrage auf <a
@@ -213,16 +206,30 @@
         </code><br><br>
         <p>
             Eine der Antworten lieferte uns jedoch die Idee, dass wir selber einen NDJSON Parser bauen könnten. Mit
-            Hilfe dessen wird nun das Input-File Zeile für Zeile durchgelesen und geparst.
+            Hilfe dessen haben wir Input-File Zeile für Zeile durchgelesen und geparst, was auch hervorragend geklappt hat.
+            Aus Performance-Gründen, haben wir uns aber schlussendlich entschieden, die Quelldaten direkt entsprechend korrekt
+            zu formatieren.
+        </p>
+
+        <h2>Finales Produkt</h2>
+        <p>
+            Das Finale Produkt kann online auf <a href="https://christophwenk.github.io/ivisPro/">GitHub</a> angesehen und getestet werden.
+        </p>
+        <img src="../pictures/Version_2018-05-11_13-48-22.png" alt="Finale Version 1">
+
+        <h2>Referenzen und Datenquellen</h2>
+        <p>
+            <ul>
+                <li>pushshift.io: <a href="https://files.pushshift.io/reddit/submissions/RS_2018-01.xz">Reddit Posts Januar 2018</a></li>
+                <li>pushshift.io: <a href="https://files.pushshift.io/reddit/submissions/RS_2018-02.xz">Reddit Posts Februar 2018</a></li>
+                <li>pushshift.io: <a href="https://files.pushshift.io/reddit/comments/RC_2018-01.xz">Reddit Kommentare Januar 2018</a></li>
+                <li>pushshift.io: <a href="https://files.pushshift.io/reddit/comments/RC_2018-02.xz">Reddit Kommentare Februar 2018</a></li>
+            </ul>
         </p><br>
 
-        <h2>Hindernisse während der Implementierung</h2>
-        <p><b>Formatierung des Datums</b></p>
-        <p>
-            Die Formatierung des Datums machte anfangs ein wenig Probleme und hat viel Zeit gekostet.
-            Das das Datum formatiert werden musste, war schnell klar. Ebenso wie das implementiert wird.
-            Allerdings machte uns das Anwenden des Formats auf die Achsen und den Plot ziemlich Mühe.
-        </p><br>
+
+
+
 
     </section>
 </div>

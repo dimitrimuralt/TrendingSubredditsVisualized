@@ -4,6 +4,7 @@ svg {
 
 path {
     fill: none;
+    pointer-events: none;
 }
 /* Reset h1 style */
 h1 {
