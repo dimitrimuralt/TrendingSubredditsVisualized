@@ -1,5 +1,3 @@
-
-
 // Create svg canvas
 const canvHeight = 600, canvWidth = 800;
 const svg = d3.select("body").append("svg")
@@ -11,10 +9,6 @@ const svg = d3.select("body").append("svg")
 const margin = {top: 50, right: 80, bottom: 120, left: 100};
 const width = canvWidth - margin.left - margin.right;
 const height = canvHeight - margin.top - margin.bottom;
-
-//const colorScale = d3.scaleOrdinal(d3.schemeCategory20);
-
-
 
 // Create the chart title
 svg.append("text")
@@ -29,12 +23,12 @@ svg.append("text")
 d3.queue()
     .defer(d3.json, "./data/posts.json")
     .defer(d3.json, "./data/postDetails.json")
-    .await(analyze)
-    ;
+    .await(analyze);
 
 function analyze(error, posts, postDetails) {
     if(error) { console.log(error); }
 
+    // Define the color scale
     const colorScale = d3.scaleOrdinal()
         .domain(function (d) {return d.subreddit; })
         .range([ "#22e67a", "#e509ae", "#9dabfa", "#437e8a", "#b21bff", "#ff7b91", "#94aa05", "#ac5906", "#82a68d", "#fe6616", "#7a7352", "#f9bc0f", "#b65d66", "#07a2e6", "#c091ae", "#8a91a7", "#88fc07", "#ea42fe", "#9e8010", "#10b437", "#c281fe", "#f92b75", "#07c99d", "#a946aa", "#bfd544", "#16977e", "#ff6ac8", "#a88178", "#5776a9", "#678007", "#fa9316", "#85c070", "#6aa2a9", "#989e5d", "#fe9169", "#cd714a", "#6ed014", "#c5639c", "#c23271", "#698ffc", "#678275", "#c5a121", "#a978ba", "#ee534e", "#d24506", "#59c3fa", "#ca7b0a", "#6f7385", "#9a634a", "#48aa6f", "#ad9ad0", "#d7908c", "#6a8a53", "#8c46fc", "#8f5ab8", "#fd1105", "#7ea7cf", "#d77cd1", "#a9804b", "#0688b4", "#6a9f3e", "#ee8fba", "#a67389", "#9e8cfe", "#bd443c", "#6d63ff", "#d110d5", "#798cc3", "#df5f83", "#b1b853", "#bb59d8", "#1d960c", "#867ba8", "#18acc9", "#25b3a7", "#f3db1d", "#938c6d", "#936a24", "#a964fb", "#92e460", "#a05787", "#9c87a0", "#20c773", "#8b696d", "#78762d", "#e154c6", "#40835f", "#d73656", "#1afd5c", "#c4f546", "#3d88d8", "#bd3896", "#1397a3", "#f940a5", "#66aeff", "#d097e7", "#fe6ef9", "#d86507", "#8b900a", "#d47270", "#e8ac48", "#cf7c97", "#cebb11", "#718a90", "#e78139", "#ff7463", "#bea1fd"]);
@@ -54,10 +48,10 @@ function analyze(error, posts, postDetails) {
     // Define the value domains
     const dateDomain = d3.extent(posts, function (d) {return d.postedDate; });
     const postsDomain = d3.extent(posts, d => Number(d.postsPerDay));
+
     // Create scales for x and y direction
     var xScale =           d3.scaleTime()  .range([0, width])                .domain(dateDomain) .nice(10);
     var yScale =           d3.scaleLinear().rangeRound([height, 0])          .domain(postsDomain).nice(10);
-
 
     // Create xAxis
     var xAxis = d3.axisBottom(xScale);
@@ -65,20 +59,16 @@ function analyze(error, posts, postDetails) {
 
     // see also https://github.com/d3/d3-brush
     var brush = d3.brush()
-        .on("end", brushended),
+            .on("end", brushended),
         idleTimeout,
-        idleDelay = 350
-    ;
-
-
+        idleDelay = 350;
 
     // Brush d3 v4 bug : brush area size cannot be modified, here the rect
     // created by brush is altered manually
     // https://stackoverflow.com/questions/48815355/d3-js-v4-brushy-cant-change-overlay-width
     svg.selectAll("rect")
         .attr("width", width)
-        .attr("height", height)
-    ;
+        .attr("height", height);
 
     svg.append("g")
         .attr("class", "axis axis--x")
@@ -90,7 +80,6 @@ function analyze(error, posts, postDetails) {
         .attr("dx", "-.8em")
         .attr("dy", ".15em")
         .attr("transform", "rotate(-65)");
-    ;
 
     svg.append("g")
         .attr("class", "axis axis--y")
@@ -101,38 +90,34 @@ function analyze(error, posts, postDetails) {
     var yAxisHeight = svg.selectAll("g.axis--y").selectAll("path.domain").node().getBoundingClientRect();
 
     var focus = svg.append("svg")
-        //624
-            .attr("width", xAxisWidth.width)
-            .attr("height", yAxisHeight.height - 3)
-            .attr("class", "focus")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    ;
+        .attr("width", xAxisWidth.width)
+        .attr("height", yAxisHeight.height - 3)
+        .attr("class", "focus")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // Brush area
     focus.append("g")
         .attr("class", "brush")
-        .call(brush)
-    ;
+        .call(brush);
 
     // Text label for the y axis
-    focus.append("text")
+    svg.append("text")
         .attr("transform", "rotate(-90)")
-        .attr("y", 0 - margin.left / 1.5)
-        .attr("x", 0 - (height / 2))
+        .attr("y", margin.left / 3)
+        .attr("x", -(height / 2) - margin.top)
         .attr("dy", "1em")
         .attr("font-family", "sans-serif")
         .style("text-anchor", "middle")
         .text("Posts per day");
 
     // Text label for the x axis
-    focus.append("text")
-        .attr("y", height + margin.bottom / 1.5)
-        .attr("x", width / 2)
+    svg.append("text")
+        .attr("x", width / 2 + margin.left)
+        .attr("y", height + margin.bottom)
         .attr("dy", "1em")
         .attr("font-family", "sans-serif")
         .style("text-anchor", "middle")
-        .text("Date")
-    ;
+        .text("Date");
 
     // Group date by subreddit
     var nestedBySubreddit = d3.nest()
@@ -143,12 +128,11 @@ function analyze(error, posts, postDetails) {
     const line = d3.line()
         .x(function (d) {return xScale(d.postedDate);})
         .y(function (d) {return yScale(d.postsPerDay);})
-        .curve(d3.curveCardinal)
-    ;
+        .curve(d3.curveCardinal);
 
     // draw lines which connect all subreddits with the same name
-        nestedBySubreddit.forEach(function (d) {
-            focus
+    nestedBySubreddit.forEach(function (d) {
+        focus
             .append("path")
             .attr("class","connectorLine")
             .attr("d",line(d.values))
@@ -159,11 +143,11 @@ function analyze(error, posts, postDetails) {
     var circlesChart = focus.selectAll("circle.circlesChart")
         .data(posts)
         .enter().append("circle")
-            .attr("class", "circlesChart")
-            .attr("cx", d => xScale(d.postedDate))
-            .attr("cy", d => yScale(d.postsPerDay))
-            .attr("r", 4)
-            .style("fill", d => colorScale(d["subreddit"]));
+        .attr("class", "circlesChart")
+        .attr("cx", d => xScale(d.postedDate))
+.attr("cy", d => yScale(d.postsPerDay))
+.attr("r", 4)
+        .style("fill", d => colorScale(d["subreddit"]));
 
     // Create tooltip
     const tooltip = d3.select("body").append("div").classed("tooltip", true);
@@ -200,17 +184,17 @@ function analyze(error, posts, postDetails) {
             focus.selectAll("circle.circlesChart")
                 .attr("r", 4)
                 .style("opacity", function(d){
-                if(    d.postedDate.getTime() < minX
-                    || d.postedDate.getTime() > maxX
-                    || d.postsPerDay          < minY
-                    || d.postsPerDay          > maxY)
-                    return 0;
-                else return 0.3
-            });
+                    if(    d.postedDate.getTime() < minX
+                        || d.postedDate.getTime() > maxX
+                        || d.postsPerDay          < minY
+                        || d.postsPerDay          > maxY)
+                        return 0;
+                    else return 0.3
+                });
 
             focus.selectAll("circle.circlesChart").transition().duration(750)
                 .filter(d => d.subreddit === postsToShow[0].subreddit)
-                .attr("r", 6)
+        .attr("r", 6)
                 .style("opacity", function(d){
                     if(    d.postedDate.getTime() < minX
                         || d.postedDate.getTime() > maxX
@@ -231,30 +215,29 @@ function analyze(error, posts, postDetails) {
             d3.selectAll(".postsContainer")
                 .append("div")
                 .html('<h1 class="">Top 3 upvoted posts on /r/' + d.subreddit + '</h1><br>'
-                + '<h2 class="date">' + dayFormatter(d.postedDate) + '</h2>'
+                    + '<h2 class="date">' + dayFormatter(d.postedDate) + '</h2>'
                 );
 
             postsToShow.forEach(
                 function (d) {
                     d3.selectAll(".postsContainer")
-                      .append("div")
+                        .append("div")
                         .attr("class", "postItem")
-                      .html(function() {
-                          if (d.thumbnail === "self" || d.thumbnail === "default" || d.thumbnail === "nsfw") {
-                              return '';
-                          }
-                          else {
-                              return '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><img class="postThumbnail" src="' + d.thumbnail + '"></a>';
-                          }})
+                        .html(function() {
+                            if (d.thumbnail === "self" || d.thumbnail === "default" || d.thumbnail === "nsfw") {
+                                return '';
+                            }
+                            else {
+                                return '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><img class="postThumbnail" src="' + d.thumbnail + '"></a>';
+                            }})
                         .append("div")
                         .attr("class", "postBody")
                         .html(
-                              '<p class="postText"> <span class="postAuthor">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
-                              + ' <span class="postPoints">Points: </span>' + d.score + '<br/>'
-                              + d.title + '<br/>'
-                              + '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
-                          );
-
+                            '<p class="postText"> <span class="postAuthor">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
+                            + ' <span class="postPoints">Points: </span>' + d.score + '<br/>'
+                            + d.title + '<br/>'
+                            + '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
+                        );
                 }
             );
         });
@@ -300,15 +283,14 @@ function analyze(error, posts, postDetails) {
                 return xScale(d.postedDate);
             })
             .attr("cy", d => yScale(d.postsPerDay))
-            .style("opacity", function(d){
-                if(    d.postedDate.getTime() < minX
-                    || d.postedDate.getTime() > maxX
-                    || d.postsPerDay          < minY
-                    || d.postsPerDay          > maxY)
-                    return 0;
-                else return 1
-            });
-        ;
+    .style("opacity", function(d){
+            if(    d.postedDate.getTime() < minX
+                || d.postedDate.getTime() > maxX
+                || d.postsPerDay          < minY
+                || d.postsPerDay          > maxY)
+                return 0;
+            else return 1
+        });
 
         focus.selectAll("path.connectorLine").remove();
         setTimeout(function(){
@@ -318,7 +300,7 @@ function analyze(error, posts, postDetails) {
                     .attr("class","connectorLine")
                     .attr("d",line(d.values))
                     .attr("stroke", function (){return colorScale(d.values[0].subreddit)})
-        });
+            });
         }, 1000);
     }
 }
