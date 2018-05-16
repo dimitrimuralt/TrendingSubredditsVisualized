@@ -89,11 +89,17 @@ function analyze(error, posts, postDetails) {
     var xAxisWidth = svg.selectAll("g.axis--x").selectAll("path.domain").node().getBoundingClientRect();
     var yAxisHeight = svg.selectAll("g.axis--y").selectAll("path.domain").node().getBoundingClientRect();
 
-    var focus = svg.append("svg")
+    // Middle layer is needed as a hacky fix for Chrome and Edge misinterpreting
+    // transform - translate with nested svg elements
+    var middleLayer = svg.append("g")
         .attr("width", xAxisWidth.width)
         .attr("height", yAxisHeight.height - 3)
-        .attr("class", "focus")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var focus = middleLayer.append("svg")
+        .attr("width", xAxisWidth.width)
+        .attr("height", yAxisHeight.height - 3)
+        .attr("class", "focus");
 
     // Brush area
     focus.append("g")
