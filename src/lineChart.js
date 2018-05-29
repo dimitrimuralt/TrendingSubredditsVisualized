@@ -18,7 +18,7 @@ svg.append("text")
     .attr("font-family", "sans-serif")
     .attr("font-size", "24px")
     .style("text-anchor", "left")
-    .text("Most popular Subreddits");
+    .text("Most active Subreddits per day");
 
 d3.queue()
     .defer(d3.json, "./data/posts.json")
