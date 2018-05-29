@@ -35,9 +35,9 @@ h2 {
 div.tooltip {
     position: absolute;
     text-align: left;
-    width: 200px;
+    width: 220px;
     height: 60px;
-    padding: 2px;
+    padding: 7px;
     font: 12px sans-serif;
     background:  #555;
     color: #fff;
