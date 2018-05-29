@@ -4,15 +4,9 @@ body {
 
 .wrapper {
     text-align: left;
+    min-width: 820px;
     max-width: 40%;
     margin: 0 auto;
-}
-
-@media only screen and (max-width: 1024px) {
-    /* For mobile phones: */
-    [class*="wrapper"] {
-        max-width: 80%;
-    }
 }
 
 h1 {
