@@ -1,8 +1,8 @@
 // Create svg canvas
-    var canvHeight = 600, canvWidth = window.innerWidth / 2 ||
+    var canvHeight = 612, canvWidth = window.innerWidth / 2 ||
         document.documentElement.clientWidth / 2 ||
         document.body.clientWidth / 2;
-    if (canvWidth < 600) canvWidth = 600;
+    if (canvWidth < 612) canvWidth = 612;
 
     var svg = d3.select("#svg-container").append("svg")
         .attr("width", canvWidth)
@@ -22,7 +22,7 @@
         .attr("font-family", "sans-serif")
         .attr("font-size", "24px")
         .style("text-anchor", "left")
-        .text("Most popular Subreddits");
+        .text("Most active subreddits per day");
 
     d3.queue()
         .defer(d3.json, "./data/posts.json")
@@ -191,7 +191,7 @@
                     .style("top", (d3.event.pageY - 28) + "px");
             })
             .on("mouseout", function (d, i) {
-                tooltip.style("visibility", "hidden")
+                tooltip.style("visibility", "hidden");
             });
 
 
@@ -212,11 +212,13 @@
                 focus.selectAll("circle.circlesChart")
                     .attr("r", 4)
                     .style("stroke", "none")
+                    .style("opacity", 0.3)
                     ;
 
                 focus.selectAll("circle.circlesChart").transition().duration(750)
                     .filter(d => d.subreddit === postsToShow[0].subreddit)
                     .attr("r", 6)
+                    .style("opacity", 1)
                 ;
 
                 d3.select(this)
@@ -263,7 +265,7 @@
                 );
             });
 
-        //Source: https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
+        //method brushended() Source: https://bl.ocks.org/mbostock/f48fcdb929a620ed97877e4678ab15e6
         function brushended() {
             var s = d3.event.selection;
             if (!s) {
@@ -272,6 +274,7 @@
                 yScale.domain(postsDomain).nice(10);
                 focus.selectAll("circle")
                     .attr("r", 4)
+                    .style("stroke", "none")
             } else {
                 xScale.domain([s[0][0], s[1][0]].map(xScale.invert, xScale));
                 yScale.domain([s[1][1], s[0][1]].map(yScale.invert, yScale));
@@ -292,7 +295,7 @@
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
                 .attr("transform", "rotate(-65)");
-            ;
+
             svg.select(".axis--y").transition(t).call(yAxis);
 
             var minX = xScale.domain()[0].getTime();
