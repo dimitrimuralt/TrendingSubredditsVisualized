@@ -60,8 +60,8 @@
         const postsDomain = d3.extent(posts, d => Number(d.postsPerDay));
 
         // Create scales for x and y direction
-        var xScale = d3.scaleTime().range([0, width]).domain(dateDomain).nice(10);
-        var yScale = d3.scaleLinear().rangeRound([height, 0]).domain(postsDomain).nice(10);
+        var xScale = d3.scaleTime().range([0, width]).domain(dateDomain).nice();
+        var yScale = d3.scaleLinear().rangeRound([height, 0]).domain(postsDomain).nice();
 
         // Create xAxis
         var xAxis = d3.axisBottom(xScale);
