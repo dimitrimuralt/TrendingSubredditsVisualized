@@ -46,22 +46,9 @@ div.tooltip {
     pointer-events: none;
 }
 
-.postsRelated {
-    margin: 0px 20px 20px 20px;
-    padding-top: 0px;
-    float: left;
-    min-width: 200px;
-    max-width: 600px;
-}
-
 .postsContainer > div > h1 {
-    align: center;
     font-size: 24px;
     font-family: sans-serif;
-}
-
-.postsContainer {
-    margin-top: 20px;
 }
 
 .postsContainer > .postItem {

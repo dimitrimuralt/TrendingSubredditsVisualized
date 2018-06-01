@@ -4,10 +4,10 @@
         document.body.clientWidth / 2;
     if (canvWidth < 600) canvWidth = 600;
 
-    var svg = d3.select("body").append("svg")
+    var svg = d3.select("#svg-container").append("svg")
         .attr("width", canvWidth)
         .attr("height", canvHeight)
-        .style("border", "1px solid");
+        //.style("border", "1px solid");
 
 // Calculate the width and height depending on margins.
     var margin = {top: 50, right: 80, bottom: 120, left: 100};
@@ -150,7 +150,8 @@
             .y(function (d) {
                 return yScale(d.postsPerDay);
             })
-            .curve(d3.curveCardinal);
+            //.curve(d3.curveCardinal)
+        ;
 
         // draw lines which connect all subreddits with the same name
         nestedBySubreddit.forEach(function (d) {
