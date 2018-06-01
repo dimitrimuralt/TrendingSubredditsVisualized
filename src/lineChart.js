@@ -172,7 +172,8 @@
             .attr("cx", d => xScale(d.postedDate))
             .attr("cy", d => yScale(d.postsPerDay))
             .attr("r", 4)
-            .style("fill", d => colorScale(d["subreddit"]));
+            .style("fill", d => colorScale(d["subreddit"]))
+        ;
 
         // Create tooltip
         const tooltip = d3.select("body").append("div").classed("tooltip", true);
@@ -200,6 +201,8 @@
                 var postsToShow = postDetails.filter(function (post) {
                     return post.subreddit === d.subreddit;
                 });
+                console.log(d);
+
 
                 var minX = xScale.domain()[0].getTime();
                 var maxX = xScale.domain()[1].getTime();
@@ -208,26 +211,18 @@
 
                 focus.selectAll("circle.circlesChart")
                     .attr("r", 4)
-                    .style("opacity", function (d) {
-                        if (d.postedDate.getTime() < minX
-                            || d.postedDate.getTime() > maxX
-                            || d.postsPerDay < minY
-                            || d.postsPerDay > maxY)
-                            return 0;
-                        else return 0.3
-                    });
+                    .style("stroke", "none")
+                    ;
 
                 focus.selectAll("circle.circlesChart").transition().duration(750)
                     .filter(d => d.subreddit === postsToShow[0].subreddit)
                     .attr("r", 6)
-                    .style("opacity", function (d) {
-                        if (d.postedDate.getTime() < minX
-                            || d.postedDate.getTime() > maxX
-                            || d.postsPerDay < minY
-                            || d.postsPerDay > maxY)
-                            return 0;
-                        else return 1
-                    });
+                ;
+
+                d3.select(this)
+                    .style("stroke", "black")
+                    .style("stroke-width", 2);
+
 
                 postsToShow = postsToShow.filter(function (postsToShow) {
                     return postsToShow.postedDate.getTime() === d.postedDate.getTime();
