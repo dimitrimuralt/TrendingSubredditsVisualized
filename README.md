@@ -18,3 +18,6 @@ Due to the huge amount of data, the source has been prepared with Google Big Que
 - View reset with double click
 - Tooltip on hover
 - Top 3 posts visible on circle (Subreddit) selection
+
+##External Resources
+- Bulma CSS Framework
