@@ -79,3 +79,7 @@ div.tooltip {
 .is-white{
     color: #f6fef9;
 }
+
+.isMin {
+    min-width: 33%;
+}
