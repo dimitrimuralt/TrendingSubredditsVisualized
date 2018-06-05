@@ -19,5 +19,5 @@ Due to the huge amount of data, the source has been prepared with Google Big Que
 - Tooltip on hover
 - Top 3 posts visible on circle (Subreddit) selection
 
-##External Resources
+## External Resources
 - Bulma CSS Framework
