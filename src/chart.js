@@ -230,31 +230,34 @@
 
                 d3.selectAll(".postsContainer")
                     .append("div")
-                    .html('<h1 class="">Top 3 upvoted posts on /r/' + d.subreddit + '</h1><br>'
-                        + '<h2 class="date">' + dayFormatter(d.postedDate) + '</h2>'
+                    .html('<h1 class="is-size-4">Top 3 upvoted posts on /r/' + d.subreddit + '</h1><br>'
+                        + '<h2 class="is-size-6 is-italic">' + dayFormatter(d.postedDate) + '</h2>'
                     );
 
                 postsToShow.forEach(
                     function (d) {
                         d3.selectAll(".postsContainer")
-                            .append("div")
-                            .attr("class", "postItem")
-                            .html(function () {
-                                if (d.thumbnail === "self" || d.thumbnail === "default" || d.thumbnail === "nsfw") {
-                                    return '';
-                                }
-                                else {
-                                    return '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><img class="postThumbnail" src="' + d.thumbnail + '"></a>';
-                                }
-                            })
-                            .append("div")
-                            .attr("class", "postBody")
+                            .append("article")
+                            .attr("class", "message")
                             .html(
-                                '<p class="postText"> <span class="postAuthor">Author: </span>' + '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a><br/>'
-                                + ' <span class="postPoints">Points: </span>' + d.score + '<br/>'
-                                + d.title + '<br/>'
-                                + '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright"></i></a></p>'
-                            );
+                            '<div class="message-header">' +
+                                '<span class="is-white">Points: '+ d.score +'</span>' +
+                                '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank"><i class="fa fa-external-link topright is-white"></i></a></p>  ' +
+
+                                '</div>' +
+                            '<div class="message-body">' +
+                                '<a href="https://www.reddit.com/' + d.permalink + '" target="_blank">' +
+                                        '<img class="" src="' + d.thumbnail + ' "  onerror="this.style.display=\'none\'" >' +
+                                '</a>' +
+                                 '<p class=""> <span class="">Author: </span>' +
+                                 '<a href="https://www.reddit.com/user/' + d.author + '" target="_blank">' + d.author + '</a>' +
+                                        '<br/>' +
+
+                                 d.title + '<br/>' +
+                                  '</div>'
+
+                            )
+;
                     }
                 );
             });

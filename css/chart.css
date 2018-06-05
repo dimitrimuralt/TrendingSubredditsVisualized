@@ -46,41 +46,9 @@ div.tooltip {
     pointer-events: none;
 }
 
-.postsContainer > div > h1 {
+.message > div > h1 {
     font-size: 24px;
     font-family: sans-serif;
-}
-
-.postsContainer > .postItem {
-    position: relative;
-    padding: 10px;
-    margin: 20px;
-    border-style: solid;
-    border-width: thin;
-    border-color: #555555;
-    background: #CEE3F8;
-    min-width: 200px;
-    max-width: 600px;
-    overflow: auto;
-}
-
-.postAuthor {
-    font-weight: bold;
-}
-
-.postPoints {
-    font-weight: bold;
-}
-
-.postsContainer > div > .date {
-    font-size: 20px;
-    text-align: center;
-    font-style: italic;
-}
-
-.postThumbnail {
-    padding-right: 10px;
-    float: left;
 }
 
 .zoom {
@@ -98,6 +66,7 @@ div.tooltip {
     top: 12px;
     right: 12px;
     font-size: 22px;
+
 }
 
 .fixedBottomRight{
@@ -105,4 +74,8 @@ div.tooltip {
     bottom: 1rem;
     right: 2rem;
     z-index: 30;
+}
+
+.is-white{
+    color: #f6fef9;
 }
