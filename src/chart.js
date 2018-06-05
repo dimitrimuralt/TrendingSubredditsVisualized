@@ -1,4 +1,5 @@
 // Create svg canvas
+    //svg width half of desktop, minimum 612px
     var canvHeight = 612, canvWidth = window.innerWidth / 2 ||
         document.documentElement.clientWidth / 2 ||
         document.body.clientWidth / 2;
@@ -7,7 +8,6 @@
     var svg = d3.select("#svg-container").append("svg")
         .attr("width", canvWidth)
         .attr("height", canvHeight)
-        //.style("border", "1px solid");
 
 // Calculate the width and height depending on margins.
     var margin = {top: 50, right: 80, bottom: 120, left: 100};
@@ -46,11 +46,9 @@
 
         posts.forEach(function (posts) {
             posts.postedDate = parseDate(posts.postedDate);
-            //d.postsPerDay =+ d.postsPerDay;
         });
         postDetails.forEach(function (postDetails) {
             postDetails.postedDate = parseDate(postDetails.postedDate);
-            //d.postsPerDay =+ d.postsPerDay;
         });
 
         // Define the value domains
@@ -67,7 +65,7 @@
         var xAxis = d3.axisBottom(xScale);
         var yAxis = d3.axisLeft(yScale);
 
-        // see also https://github.com/d3/d3-brush
+        //brush selection used for zooming, wail with zooming till selection complete
         var brush = d3.brush()
                 .on("end", brushended),
             idleTimeout,
@@ -150,7 +148,6 @@
             .y(function (d) {
                 return yScale(d.postsPerDay);
             })
-            //.curve(d3.curveCardinal)
         ;
 
         // draw lines which connect all subreddits with the same name
@@ -203,29 +200,26 @@
                 });
                 console.log(d);
 
-
-                var minX = xScale.domain()[0].getTime();
-                var maxX = xScale.domain()[1].getTime();
-                var minY = yScale.domain()[0];
-                var maxY = yScale.domain()[1];
-
+                // gray out all circles
                 focus.selectAll("circle.circlesChart")
                     .attr("r", 4)
                     .style("stroke", "none")
                     .style("opacity", 0.3)
                     ;
 
+                // highlight selected subreddit
                 focus.selectAll("circle.circlesChart").transition().duration(750)
                     .filter(d => d.subreddit === postsToShow[0].subreddit)
                     .attr("r", 6)
                     .style("opacity", 1)
                 ;
 
+                //highlight selected circle
                 d3.select(this)
                     .style("stroke", "black")
                     .style("stroke-width", 2);
 
-
+                // select posts details to show
                 postsToShow = postsToShow.filter(function (postsToShow) {
                     return postsToShow.postedDate.getTime() === d.postedDate.getTime();
                 });
