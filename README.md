@@ -3,7 +3,7 @@ Data Visualization project for ivis class.
 
 Worklog (Written in German): https://christophwenk.github.io/ivisPro/html/worklog.html
 
-Published site: https://christophwenk.github.io/ivisPro/
+Published site: https://christophwenk.github.io/TrendingSubredditsVisualized/
 
 ## About
 This project was realized with the [D3.V4](https://d3js.org/) Javascript library as a study project.
