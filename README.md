@@ -1,7 +1,7 @@
 # Trending Subreddits Visualized
 Data Visualization project for ivis class.
 
-Worklog (Written in German): https://christophwenk.github.io/ivisPro/html/worklog.html
+Worklog (Written in German): https://christophwenk.github.io/TrendingSubredditsVisualized/html/worklog.html
 
 Published site: https://christophwenk.github.io/TrendingSubredditsVisualized/
 
