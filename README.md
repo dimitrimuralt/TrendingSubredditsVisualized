@@ -1,9 +1,9 @@
 # Trending Subreddits Visualized
 Data Visualization project for ivis class.
 
-Worklog (Written in German): https://christophwenk.github.io/TrendingSubredditsVisualized/html/worklog.html
+Worklog (Written in German): https://dimitrimuralt.github.io/TrendingSubredditsVisualized/html/worklog.html
 
-Published site: https://christophwenk.github.io/TrendingSubredditsVisualized/
+Published site: https://dimitrimuralt.github.io/TrendingSubredditsVisualized/
 
 ## About
 This project was realized with the [D3.V4](https://d3js.org/) Javascript library as a study project.
